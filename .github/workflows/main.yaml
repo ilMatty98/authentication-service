@@ -1,0 +1,126 @@
+name: Java GraalVM 21 native CI with Maven  # Name of the workflow
+
+on:
+  pull_request: # Trigger the workflow on pull requests
+    branches:
+      - main  # Run the workflow only if the pull request is targeted to the 'main' branch
+    types:
+      - opened  # Run the workflow when a pull request is opened
+      - synchronize  # Run the workflow when a pull request is updated
+
+permissions:
+  contents: write # Allows to write to the repository
+
+jobs:
+  build:
+    # Condition to run the job: only if the source branch starts with 'develop/', 'feature/', or 'fix/'
+    if: |
+      startsWith(github.head_ref, 'develop/') ||
+      startsWith(github.head_ref, 'feature/') ||
+      startsWith(github.head_ref, 'fix/')
+    runs-on: ubuntu-latest  # Specify the OS for the runner (ubuntu-latest)
+
+    steps:
+      # Step to check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step to install the Java Development Kit (JDK)
+      - name: Set up GraalVM 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'graalvm'
+          java-version: '21'
+
+      # Step to determine which part of the version to update based on the starting branch
+      - name: Determine version bump
+        id: version_bump
+        run: |
+          case "${{ github.event.action }}" in
+            opened)
+              case "${{ github.head_ref }}" in
+                develop/*) echo "bump_type=major" >> $GITHUB_ENV ;;
+                feature/*) echo "bump_type=minor" >> $GITHUB_ENV ;;
+                fix/*) echo "bump_type=patch" >> $GITHUB_ENV ;;
+                *) echo "bump_type=none" >> $GITHUB_ENV ;;  # Fallback if no match
+              esac
+              ;;
+            *)
+              echo "bump_type=none" >> $GITHUB_ENV  # If not opened, set to none
+              ;;
+          esac
+
+      # Step to upgrade the version in pom.xml
+      - name: Upgrade version in pom.xml
+        if: env.bump_type != 'none'  # Execute this step only if bump_type is not 'none'
+        run: |
+          # Extract current version from pom.xml
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          # Split the version into major, minor, and patch
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+
+          # Increment version based on bump type
+          if [ "$bump_type" == "major" ]; then
+            NEW_VERSION=$((major + 1)).0.0
+          elif [ "$bump_type" == "minor" ]; then
+            NEW_VERSION=$major.$((minor + 1)).0
+          else
+            NEW_VERSION=$major.$minor.$((patch + 1))
+          fi
+
+          # Update version in pom.xml
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
+
+          # Export the new version as an environment variable
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        env:
+          NEW_VERSION: ${{ env.new_version }}
+
+      # Step to upgrade the repository
+      - name: Commit pom.xml, generate tag and Push
+        if: env.bump_type != 'none'  # Execute this step only if bump_type is not 'none'
+        run: |
+          git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
+          git add pom.xml
+          git commit -m "Upgrade version"
+          git tag "v$NEW_VERSION"
+          git push -f origin HEAD:refs/heads/${{ github.head_ref }} --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}  # Token for authentication
+          NEW_VERSION: ${{ env.NEW_VERSION }}  # The new version calculated earlier
+
+      # Step to caching to save Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository  # Path to the cache location (where Maven stores dependencies)
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Unique cache key based on OS and pom.xml content
+          restore-keys: |
+            ${{ runner.os }}-maven-  # Fallback key based on OS only
+
+      # Step to run tests with Maven and generate a coverage report with Jacoco
+      - name: Run tests with Maven
+        run:
+
+      # Step to perform code quality analysis with SonarQube
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Authentication token for SonarQube
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # URL of the SonarQube server
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.branch.name=master
+            -Dsonar.java.binaries=target/classes
+            -Dsonar.coverage.exclusions=**/test/**/*
+            -Dsonar.exclusions=**/test/**/*
+
+      # Step to wait for SonarQube Quality Gate results
+      - name: Wait for SonarQube Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

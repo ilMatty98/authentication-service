@@ -1,0 +1,19 @@
+{
+  "subject": {
+    "IT": "Cambio email effettuato!",
+    "EN": "Email changed!"
+  },
+  "template": {
+    "title": {
+      "IT": "Cambio Email effettuato!",
+      "EN": "Email changed!"
+    },
+    "body": {
+      "IT": "È stato effettuato il cambio dell'email!",
+      "EN": "Email has been changed!"
+    },
+    "footer": {
+      "EN": "Credentials Manager"
+    }
+  }
+}

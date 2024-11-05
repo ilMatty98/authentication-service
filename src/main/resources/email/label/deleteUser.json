@@ -1,0 +1,15 @@
+{
+  "subject": {
+    "IT": "Eliminato con successo il tuo account Credentials Manager!",
+    "EN": "Successfully deleted your Credential Manager account!"
+  },
+  "template": {
+    "title": {
+      "IT": "Il tuo account è stato cancellato",
+      "EN": "Your account has been cancelled"
+    },
+    "footer": {
+      "EN": "Credentials Manager"
+    }
+  }
+}

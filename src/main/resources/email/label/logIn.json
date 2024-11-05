@@ -1,0 +1,27 @@
+{
+  "subject": {
+    "IT": "Nuovo accesso su Credential Manager!",
+    "EN": "New access on Credential Manager!"
+  },
+  "template": {
+    "title": {
+      "IT": "È stato rilevato un nuovo accesso",
+      "EN": "A new access was detected"
+    },
+    "date": {
+      "IT": "Data: ",
+      "EN": "Date: "
+    },
+    "ipAddress": {
+      "IT": "Indirizzo IP: ",
+      "EN": "IP Address: "
+    },
+    "device": {
+      "IT": "Tipo dispositivo: ",
+      "EN": "Device Type: "
+    },
+    "footer": {
+      "EN": "Credentials Manager"
+    }
+  }
+}

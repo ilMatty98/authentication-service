@@ -1,0 +1,19 @@
+{
+  "subject": {
+    "IT": "La tua email cambia!",
+    "EN": "Your Email Change!"
+  },
+  "template": {
+    "title": {
+      "IT": "La tua email cambia!",
+      "EN": "Your Email Change!"
+    },
+    "body": {
+      "IT": "Per finalizzare la modifica del tuo indirizzo email Bitwarden, inserisci il seguente codice nel web vault",
+      "EN": "To finalize changing your Bitwarden email address enter the following code in web vault"
+    },
+    "footer": {
+      "EN": "Credentials Manager"
+    }
+  }
+}

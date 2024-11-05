@@ -1,0 +1,58 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="1" author="ilMatty98">
+        <createTable tableName="users">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="users_id_pk"/>
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="salt" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hash" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="protected_symmetric_key" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="initialization_vector" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp_creation" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp_last_access" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp_password" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp_email" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hint" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="propic" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="language" type="varchar(2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="verification_code" type="varchar(36)"/>
+            <column name="attempt" type="int"/>
+            <column name="new_email" type="varchar(100)"/>
+        </createTable>
+        <addAutoIncrement tableName="users" columnName="id" columnDataType="bigint" startWith="1" incrementBy="1"/>
+        <sql>ALTER TABLE users
+            ADD CONSTRAINT state_check CHECK (state in ('UNVERIFIED', 'VERIFIED'))</sql>
+    </changeSet>
+</databaseChangeLog>

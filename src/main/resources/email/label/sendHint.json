@@ -1,0 +1,19 @@
+{
+  "subject": {
+    "IT": "Suggerimento per la password principale",
+    "EN": "Your Master Password Hint"
+  },
+  "template": {
+    "info": {
+      "IT": "Tu (o qualcuno) hai recentemente richiesto il suggerimento per la password principale.",
+      "EN": "You (or someone) recently requested your master password hint."
+    },
+    "hint": {
+      "IT": "Il tuo suggerimento è",
+      "EN": "Your hint is"
+    },
+    "footer": {
+      "EN": "Credentials Manager"
+    }
+  }
+}

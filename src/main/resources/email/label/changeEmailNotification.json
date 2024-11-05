@@ -1,0 +1,19 @@
+{
+  "subject": {
+    "IT": "La tua email cambia!",
+    "EN": "Your Email Change!"
+  },
+  "template": {
+    "title": {
+      "IT": "La tua email cambia!",
+      "EN": "Your Email Change!"
+    },
+    "body": {
+      "IT": "Recentemente è stata tentata la modifica al tuo account per utilizzare questo nuovo indirizzo email",
+      "EN": "A change to your account was recently attempted to use this new email address"
+    },
+    "footer": {
+      "EN": "Credentials Manager"
+    }
+  }
+}

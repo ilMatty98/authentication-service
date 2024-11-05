@@ -1,0 +1,19 @@
+{
+  "subject": {
+    "IT": "Cambio Password effettuato!",
+    "EN": "Password changed!"
+  },
+  "template": {
+    "title": {
+      "IT": "Cambio Password effettuato!",
+      "EN": "Password changed!"
+    },
+    "body": {
+      "IT": "È stato effettuato il cambio della Password!",
+      "EN": "Password has been changed!"
+    },
+    "footer": {
+      "EN": "Credentials Manager"
+    }
+  }
+}
