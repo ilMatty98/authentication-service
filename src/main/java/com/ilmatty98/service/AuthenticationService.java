@@ -1,11 +1,16 @@
 package com.ilmatty98.service;
 
 import com.ilmatty98.constants.EmailTypeEnum;
+import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
+import com.ilmatty98.dto.response.AccessDto;
+import com.ilmatty98.entity.User;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
 import com.ilmatty98.utils.AuthenticationUtils;
+import io.quarkus.security.UnauthorizedException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
@@ -16,7 +21,9 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.*;
+
+import static java.util.Map.entry;
 
 @Slf4j
 @ApplicationScoped
@@ -48,8 +55,8 @@ public class AuthenticationService {
     int emailChangeAttempts;
 
     private final EmailService emailService;
-//
-//    private final TokenJwtService tokenJwtService;
+
+    private final TokenJwtService tokenJwtService;
 
     private final UserRepository userRepository;
 
@@ -60,7 +67,7 @@ public class AuthenticationService {
     public void signUp(SignUpDto signUpDto) {
         log.info("Init signUp for user {}", signUpDto.getEmail());
         if (userRepository.existsByEmail(signUpDto.getEmail())) {
-            log.warn("User %{} already registered", signUpDto.getEmail());
+            log.warn("User {} already registered", signUpDto.getEmail());
             throw new BadRequestException();
         }
 
@@ -78,7 +85,56 @@ public class AuthenticationService {
         log.info("End signUp for user {}", signUpDto.getEmail());
     }
 
+    @SneakyThrows
+    @Transactional
+    public AccessDto logIn(LogInDto logInDto) {
+        log.info("Init logIn for user {}", logInDto.getEmail());
+        var user = userRepository.findByEmail(logInDto.getEmail())
+                .orElseThrow(() -> {
+                    log.warn("User {} not found", logInDto.getEmail());
+                    return new UnauthorizedException();
+                });
+
+        if (UserStateEnum.UNVERIFIED.equals(user.getState())) {
+            log.warn("User {} not confirmed", logInDto.getEmail());
+            throw new UnauthorizedException();
+        }
+
+        checkPassword(user, logInDto.getMasterPasswordHash());
+
+        user.setTimestampLastAccess(getCurrentTimestamp());
+        userRepository.persist(user);
+
+        var claims = new HashMap<String, Object>();
+        claims.put(TokenClaimEnum.ID.getLabel(), user.getId());
+        claims.put(TokenClaimEnum.EMAIL.getLabel(), user.getEmail());
+        claims.put(TokenClaimEnum.ROLE.getLabel(), user.getState().name());
+
+        var token = tokenJwtService.generateTokenJwt(user.getEmail(), claims);
+
+        var dynamicLabels = Map.ofEntries(
+                entry("date_value", logInDto.getLocalDateTime()),
+                entry("ipAddress_value", logInDto.getIpAddress()),
+                entry("device_value", logInDto.getDeviceType())
+        );
+
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.LOG_IN, dynamicLabels);
+        return authenticationMapper.newAccessDto(user, token, tokenJwtService.getPublicKey());
+    }
+
     private static Timestamp getCurrentTimestamp() {
         return Timestamp.from(Instant.now());
+    }
+
+    private void checkPassword(User user, String masterPasswordHash) {
+        var storedHash = Base64.getDecoder().decode(user.getHash());
+        var salt = Base64.getDecoder().decode(user.getSalt());
+        var currentHash = AuthenticationUtils.generateArgon2id(masterPasswordHash, salt,
+                argon2idSize, argon2idIterations, argon2idMemoryKB, argon2idParallelism);
+
+        if (!Arrays.equals(storedHash, currentHash)) {
+            log.warn("Invalid credentials for user {}", user.getEmail());
+            throw new UnauthorizedException();
+        }
     }
 }
