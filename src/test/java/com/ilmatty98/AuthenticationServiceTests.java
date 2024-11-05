@@ -8,10 +8,12 @@ import com.ilmatty98.entity.User;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
 import com.ilmatty98.service.EmailService;
+import com.ilmatty98.service.TokenJwtService;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.SneakyThrows;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -34,10 +36,16 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     protected EmailService emailService;
 
     @Inject
+    protected TokenJwtService tokenJwtService;
+
+    @Inject
     protected UserRepository userRepository;
 
     @Inject
     protected AuthenticationMapper authenticationMapper;
+
+    @ConfigProperty(name = "token.expiration-minutes")
+    protected long tokenExpiration;
 
     private static final Random random = new Random();
 

@@ -1,11 +1,12 @@
 package com.ilmatty98.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.quarkus.runtime.Startup;
 import io.quarkus.scheduler.Scheduled;
+import io.quarkus.security.UnauthorizedException;
 import jakarta.enterprise.context.ApplicationScoped;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -23,7 +24,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
-@Getter
 @Slf4j
 @ApplicationScoped
 public class TokenJwtService {
@@ -36,14 +36,11 @@ public class TokenJwtService {
 
     private static final int KEY_SIZE = 2048;
     private static final String ALGORITHM = "RSA";
-    private static final String AUTH_HEADER_NAME = "Authorization";
-    private static final String AUTH_HEADER_PREFIX = "Bearer ";
 
     @Startup
     void init() {
         generateKeyPair();
     }
-
 
     @Scheduled(cron = "{token.key-rotation.cron}")
     public static void generateKeyPair() {
@@ -86,22 +83,17 @@ public class TokenJwtService {
     @SneakyThrows
     public Map<String, Object> validateTokenJwt(String token) {
         try {
-            Claims claims = Jwts.parser()
+            return Jwts.parser()
                     .verifyWith(publicKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-
-            var expiration = claims.getExpiration();
-            if (expiration != null && expiration.before(new Date())) {
-                log.warn("Token is expired");
-                return null;
-            }
-
-            return claims;
+        } catch (ExpiredJwtException e) {
+            log.warn("Token is expired");
+            throw new UnauthorizedException();
         } catch (Exception e) {
-            log.error("Invalid token", e);
-            return null;
+            log.warn("Invalid token");
+            throw new UnauthorizedException();
         }
     }
 
