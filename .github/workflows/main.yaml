@@ -115,6 +115,7 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.branch.name=master
             -Dsonar.java.binaries=target/classes
+            -Dsonar.sources=src
             -Dsonar.coverage.exclusions=**/test/**/*
             -Dsonar.exclusions=**/test/**/*
 
