@@ -47,7 +47,7 @@ class SignUpTest extends AuthenticationServiceTests {
 
         given()
                 .contentType(ContentType.JSON)
-                .body(new SignUpDto())
+                .body(signUp)
                 .when()
                 .post(SIGN_UP_URL)
                 .then()
@@ -210,6 +210,24 @@ class SignUpTest extends AuthenticationServiceTests {
     }
 
     @Test
+    void testAlreadySignUp() {
+        signUp(EMAIL, PASSWORD);
+        confirmEmail(EMAIL);
+
+        var signUp = fillObject(new SignUpDto());
+        signUp.setEmail(PASSWORD);
+        signUp.setLanguage(EN);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(signUp)
+                .when()
+                .post(SIGN_UP_URL)
+                .then()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
     void testSignUp() {
         var signUp = fillObject(new SignUpDto());
         signUp.setEmail(EMAIL);
@@ -244,17 +262,6 @@ class SignUpTest extends AuthenticationServiceTests {
                     assertNull(user.getNewEmail());
                     assertNull(user.getAttempt());
                 }, Assertions::fail);
-
-//        //Check email
-//        var receivedMessages = greenMail.getReceivedMessages();
-//        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
-//        assertEquals(1, receivedMessages.length);
-//
-//        var email = receivedMessages[0];
-//        assertEquals(1, email.getAllRecipients().length);
-//        assertEquals(emailFrom, email.getFrom()[0].toString());
-//        assertEquals(signUp.getEmail(), email.getAllRecipients()[0].toString());
-//        assertEquals("Welcome to Credentials Manager!", email.getSubject());
     }
 
 }

@@ -16,7 +16,6 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -63,7 +62,6 @@ public class AuthenticationService {
 
     private final AuthenticationMapper authenticationMapper;
 
-    @SneakyThrows
     @Transactional
     public boolean signUp(SignUpDto signUpDto) {
         log.info("Init signUp for user {}", signUpDto.getEmail());
@@ -86,7 +84,6 @@ public class AuthenticationService {
         return true;
     }
 
-    @SneakyThrows
     @Transactional
     public AccessDto logIn(LogInDto logInDto) {
         log.info("Init logIn for user {}", logInDto.getEmail());
@@ -129,7 +126,6 @@ public class AuthenticationService {
         return userRepository.existsByEmail(email);
     }
 
-    @SneakyThrows
     @Transactional
     public boolean confirmEmail(String email, String code) {
         log.info("Init confirmEmail for user {}", email);
