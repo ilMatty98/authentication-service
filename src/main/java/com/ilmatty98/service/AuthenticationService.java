@@ -14,6 +14,7 @@ import io.quarkus.security.UnauthorizedException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -64,13 +65,12 @@ public class AuthenticationService {
 
     @SneakyThrows
     @Transactional
-    public void signUp(SignUpDto signUpDto) {
+    public boolean signUp(SignUpDto signUpDto) {
         log.info("Init signUp for user {}", signUpDto.getEmail());
         if (userRepository.existsByEmail(signUpDto.getEmail())) {
             log.warn("User {} already registered", signUpDto.getEmail());
             throw new BadRequestException();
         }
-
 
         var salt = AuthenticationUtils.generateSalt(saltSize);
         var hash = AuthenticationUtils.generateArgon2id(signUpDto.getMasterPasswordHash(), salt, argon2idSize,
@@ -83,6 +83,7 @@ public class AuthenticationService {
         emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SING_UP, dynamicLabels);
         userRepository.persist(user);
         log.info("End signUp for user {}", signUpDto.getEmail());
+        return true;
     }
 
     @SneakyThrows
@@ -92,7 +93,7 @@ public class AuthenticationService {
         var user = userRepository.findByEmail(logInDto.getEmail())
                 .orElseThrow(() -> {
                     log.warn("User {} not found", logInDto.getEmail());
-                    return new UnauthorizedException();
+                    return new NotFoundException();
                 });
 
         if (UserStateEnum.UNVERIFIED.equals(user.getState())) {
@@ -119,7 +120,30 @@ public class AuthenticationService {
         );
 
         emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.LOG_IN, dynamicLabels);
+        log.info("End logIn for user {}", logInDto.getEmail());
         return authenticationMapper.newAccessDto(user, token, tokenJwtService.getPublicKey());
+    }
+
+    public boolean checkEmail(String email) {
+        log.info("Init checkEmail for user {}", email);
+        return userRepository.existsByEmail(email);
+    }
+
+    @SneakyThrows
+    @Transactional
+    public boolean confirmEmail(String email, String code) {
+        log.info("Init confirmEmail for user {}", email);
+        var user = userRepository.findByEmailAndVerificationCode(email, code)
+                .orElseThrow(() -> {
+                    log.warn("User {} not found", email);
+                    return new NotFoundException();
+                });
+
+        user.setState(UserStateEnum.VERIFIED);
+        user.setVerificationCode(null);
+        userRepository.persist(user);
+        log.info("End confirmEmail for user {}", email);
+        return true;
     }
 
     private static Timestamp getCurrentTimestamp() {
@@ -137,4 +161,6 @@ public class AuthenticationService {
             throw new UnauthorizedException();
         }
     }
+
+
 }

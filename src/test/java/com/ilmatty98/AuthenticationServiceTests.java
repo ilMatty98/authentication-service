@@ -1,7 +1,5 @@
 package com.ilmatty98;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.entity.User;
@@ -10,8 +8,10 @@ import com.ilmatty98.repository.UserRepository;
 import com.ilmatty98.service.EmailService;
 import com.ilmatty98.service.TokenJwtService;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.Response;
 import lombok.SneakyThrows;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Assertions;
@@ -105,12 +105,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         }
     }
 
-    protected static String objectToJsonString(Object object) throws JsonProcessingException {
-        var ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        return ow.writeValueAsString(object);
-    }
-
-    protected User signUp(String email, String password) throws Exception {
+    protected User signUp(String email, String password) {
         var signUp = new SignUpDto();
         signUp.setEmail(email);
         signUp.setMasterPasswordHash(password);
@@ -121,16 +116,27 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         signUp.setPropic("Propic");
 
         given()
-                .contentType("application/json")
+                .contentType(ContentType.JSON)
                 .body(signUp)
                 .when()
                 .post(SIGN_UP_URL)
                 .then()
-                .statusCode(204);
+                .statusCode(Response.Status.OK.getStatusCode());
 
         return userRepository.findByEmail(email).orElseGet(Assertions::fail);
     }
 
+    protected User confirmEmail(String email) {
+        var user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
+
+        given()
+                .contentType(ContentType.JSON)
+                .patch(CONFIRM_EMAIL_URL, email, user.getVerificationCode())
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+
+        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+    }
 
     protected static LocalDateTime getLocalDataTime(Timestamp timestamp) {
         return Optional.ofNullable(timestamp)

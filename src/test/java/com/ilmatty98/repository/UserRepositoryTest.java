@@ -19,14 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UserRepositoryTest extends AuthenticationServiceTests {
 
     @Test
-    void testExistsByEmail() throws Exception {
+    void testExistsByEmail() {
         assertFalse(userRepository.existsByEmail(EMAIL));
         signUp(EMAIL, PASSWORD);
         assertTrue(userRepository.existsByEmail(EMAIL));
     }
 
     @Test
-    void testFindByEmail() throws Exception {
+    void testFindByEmail() {
         assertFalse(userRepository.findByEmail(EMAIL).isPresent());
         var user = signUp(EMAIL, PASSWORD);
         checkUser((userRepository) -> userRepository.findByEmail(EMAIL), user);
@@ -34,7 +34,7 @@ class UserRepositoryTest extends AuthenticationServiceTests {
 
     @Test
     @Transactional
-    void testFindByEmailAndState() throws Exception {
+    void testFindByEmailAndState() {
         var user = signUp(EMAIL, PASSWORD);
         user.setState(UserStateEnum.UNVERIFIED);
         userRepository.persist(user);
@@ -49,7 +49,7 @@ class UserRepositoryTest extends AuthenticationServiceTests {
 
     @Test
     @Transactional
-    void findByEmailAndNewEmailAndState() throws Exception {
+    void findByEmailAndNewEmailAndState() {
         var newEmail = EMAIL + ".";
         var user = signUp(EMAIL, PASSWORD);
         user.setState(UserStateEnum.UNVERIFIED);
@@ -66,7 +66,7 @@ class UserRepositoryTest extends AuthenticationServiceTests {
 
     @Test
     @Transactional
-    void testFindByEmailAndVerificationCode() throws Exception {
+    void testFindByEmailAndVerificationCode() {
         var user = signUp(EMAIL, PASSWORD);
         user.setVerificationCode("code1");
         userRepository.persist(user);
