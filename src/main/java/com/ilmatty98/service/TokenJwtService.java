@@ -59,7 +59,6 @@ public class TokenJwtService {
         }
     }
 
-    @SneakyThrows
     public String generateTokenJwt(String subject, Map<String, Object> claims) {
         var now = Instant.now();
         claims.put(Claims.SUBJECT, subject);
@@ -80,7 +79,6 @@ public class TokenJwtService {
         return Base64.getEncoder().encodeToString(encodedKey);
     }
 
-    @SneakyThrows
     public Map<String, Object> validateTokenJwt(String token) {
         try {
             return Jwts.parser()

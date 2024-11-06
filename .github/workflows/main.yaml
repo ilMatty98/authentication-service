@@ -1,4 +1,4 @@
-name: Java GraalVM 21 native CI with Maven  # Name of the workflow
+name: Java GraalVM 21 native CI with Maven for App Quarkus # Name of the workflow
 
 on:
   pull_request: # Trigger the workflow on pull requests
