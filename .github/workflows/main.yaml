@@ -1,4 +1,4 @@
-name: Java GraalVM 21 native CI with Maven for App Quarkus # Name of the workflow
+name: Java GraalVM 21 CI with Maven for App Quarkus # Name of the workflow
 
 on:
   pull_request: # Trigger the workflow on pull requests
@@ -124,3 +124,26 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # Step to extract version from pom.xml
+      - name: Get version from pom.xml
+        id: get_version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # Step to build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ilmatty98/authentication-service:${{ env.VERSION }} .
+        env:
+          DOCKER_BUILDKIT: 1  # Optional for enhanced Docker build performance
+
+      # Step to push Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+          docker push ilmatty98/authentication-service:${{ env.VERSION }}
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
