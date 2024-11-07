@@ -29,9 +29,9 @@ jobs:
       - name: Set up GraalVM 17
         uses: graalvm/setup-graalvm@v1
         with:
-        java-version: '17'
-        distribution: 'graalvm'
-        native-image-job-reports: 'true'
+          java-version: '17'
+          distribution: 'graalvm'
+          native-image-job-reports: 'true'
 
       # Step to determine which part of the version to update based on the starting branch
       - name: Determine version bump
