@@ -101,8 +101,8 @@ jobs:
             ${{ runner.os }}-maven-  # Fallback key based on OS only
 
       # Step to run tests with Maven and generate a coverage report with Jacoco
-      - name: Run tests with Maven
-        run: mvn clean verify jacoco:report -Pnative
+      - name: Run tests in native mode with Maven
+        run: mvn clean verify -Pnative
 
       # Step to perform code quality analysis with SonarQube
       - name: SonarQube Scan
