@@ -102,7 +102,7 @@ jobs:
 
       # Step to run tests with Maven and generate a coverage report with Jacoco
       - name: Run tests in native mode with Maven
-        run: mvn clean verify -Pnative
+        run: mvn clean verify jacoco:report -Pnative
 
       # Step to perform code quality analysis with SonarQube
       - name: SonarQube Scan
