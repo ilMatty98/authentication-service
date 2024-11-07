@@ -5,8 +5,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.quarkus.runtime.Startup;
 import io.quarkus.scheduler.Scheduled;
-import io.quarkus.security.UnauthorizedException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.NotAuthorizedException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -88,10 +88,10 @@ public class TokenJwtService {
                     .getPayload();
         } catch (ExpiredJwtException e) {
             log.warn("Token is expired");
-            throw new UnauthorizedException();
+            throw new NotAuthorizedException("");
         } catch (Exception e) {
             log.warn("Invalid token");
-            throw new UnauthorizedException();
+            throw new NotAuthorizedException("");
         }
     }
 

@@ -10,10 +10,10 @@ import com.ilmatty98.entity.User;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
 import com.ilmatty98.utils.AuthenticationUtils;
-import io.quarkus.security.UnauthorizedException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +95,7 @@ public class AuthenticationService {
 
         if (UserStateEnum.UNVERIFIED.equals(user.getState())) {
             log.warn("User {} not confirmed", logInDto.getEmail());
-            throw new UnauthorizedException();
+            throw new NotAuthorizedException("");
         }
 
         checkPassword(user, logInDto.getMasterPasswordHash());
@@ -154,7 +154,7 @@ public class AuthenticationService {
 
         if (!Arrays.equals(storedHash, currentHash)) {
             log.warn("Invalid credentials for user {}", user.getEmail());
-            throw new UnauthorizedException();
+            throw new NotAuthorizedException("");
         }
     }
 
