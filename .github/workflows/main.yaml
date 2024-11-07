@@ -29,8 +29,9 @@ jobs:
       - name: Set up GraalVM 17
         uses: graalvm/setup-graalvm@v1
         with:
-          distribution: 'graalvm'
-          java-version: '17'
+        java-version: '17'
+        distribution: 'graalvm'
+        native-image-job-reports: 'true'
 
       # Step to determine which part of the version to update based on the starting branch
       - name: Determine version bump
@@ -101,7 +102,7 @@ jobs:
 
       # Step to run tests with Maven and generate a coverage report with Jacoco
       - name: Run tests with Maven
-        run: mvn clean verify jacoco:report
+        run: mvn clean verify jacoco:report -Pnative
 
       # Step to perform code quality analysis with SonarQube
       - name: SonarQube Scan
