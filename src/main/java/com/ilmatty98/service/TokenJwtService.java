@@ -9,12 +9,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotAuthorizedException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
-import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
@@ -46,8 +44,7 @@ public class TokenJwtService {
     public static void generateKeyPair() {
         try {
             log.info("Started generation of key pair for jwt token");
-            Security.addProvider(new BouncyCastleProvider());
-            var keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM, "BC");
+            var keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
             keyPairGenerator.initialize(KEY_SIZE);
 
             var keyPair = keyPairGenerator.generateKeyPair();
