@@ -1,4 +1,4 @@
-name: Java GraalVM 21 CI with Maven for App Quarkus # Name of the workflow
+name: Quarkus - Java GraalVM Native JAVA 17 with Maven # Name of the workflow
 
 on:
   pull_request: # Trigger the workflow on pull requests
@@ -30,7 +30,7 @@ jobs:
         uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'graalvm'
-          java-version: '21'
+          java-version: '17'
 
       # Step to determine which part of the version to update based on the starting branch
       - name: Determine version bump
