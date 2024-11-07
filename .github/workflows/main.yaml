@@ -23,7 +23,7 @@ jobs:
     steps:
       # Step to check out the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step to install the Java Development Kit (JDK)
       - name: Set up GraalVM 17
@@ -93,7 +93,7 @@ jobs:
 
       # Step to caching to save Maven dependencies
       - name: Cache Maven dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository  # Path to the cache location (where Maven stores dependencies)
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Unique cache key based on OS and pom.xml content
