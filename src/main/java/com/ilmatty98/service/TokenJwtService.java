@@ -47,7 +47,7 @@ public class TokenJwtService {
         try {
             log.info("Started generation of key pair for jwt token");
             Security.addProvider(new BouncyCastleProvider());
-            var keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
+            var keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM, "BC");
             keyPairGenerator.initialize(KEY_SIZE);
 
             var keyPair = keyPairGenerator.generateKeyPair();
