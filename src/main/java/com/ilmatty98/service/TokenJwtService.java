@@ -40,8 +40,9 @@ public class TokenJwtService {
 
     @Startup
     void init() {
+        log.info("List of providers:");
         for (Provider provider : Security.getProviders()) {
-            System.out.println(provider.getName());
+            log.info(provider.getName());
         }
         generateKeyPair();
     }

@@ -27,7 +27,7 @@ RUN ls -latr ./mvnw
 # Copy the application source code to the working directory
 COPY src /code/src
 
-# Build the application in native mode, skipping tests and allocating 7GB of memory for the native build
+# Build the application in native mode
 RUN ./mvnw package -Pnative
 
 ## Stage 2 : create the docker final image
