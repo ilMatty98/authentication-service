@@ -18,7 +18,7 @@
         <!-- Dependencies -->
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.34</lombok.version>
-        <bouncycastle.version>1.70</bouncycastle.version>
+        <bouncycastle.version>1.79</bouncycastle.version>
         <jsonwebtoken.version>0.12.6</jsonwebtoken.version>
         <!-- Jacoco for coverage -->
         <jacoco.version>0.8.11</jacoco.version>
@@ -124,7 +124,7 @@
         <!-- bouncy castle -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
+            <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
         </dependency>
 
