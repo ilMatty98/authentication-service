@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service # Name of deployment
+spec:
+  replicas: 1 # Number of replicas on pod
+  selector:
+    matchLabels:
+      app: authentication-service
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - name: authentication-service # Name of container
+          image:  # Image from docker hub
+          ports:
+            - containerPort: 8080 # Port on which the container exposes the service
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+            requests:
+              memory: "256Mi"
+              cpu: "0.5"
+          env: # Definition of environment variables
+            - name: SHOW_SWAGGER
+              value: 'true'
+            - name: DB_URL
+              value: ''
+            - name: DB_USERNAME
+              value: ''
+            - name: DB_PASSWORD
+              value: ''
+            - name: SALT_SIZE
+              value: '128'
+            - name: ARGON2ID_SIZE
+              value: '256'
+            - name: ARGON2ID_ITERATIONS
+              value: '3'
+            - name: ARGON2ID_MEMORYKB
+              value: '64000'
+            - name: ARGON2ID_PARALLELISM
+              value: '4'
+            - name: TOKEN_ROTATION_CRON
+              value: '0 0 3 * * ?'
+            - name: TOKEN_EXPIRATION_MINUTES
+              value: '10'
+            - name: CHANGE_EMAIL.EXPIRATION-MINUTES
+              value: '15'
+            - name: CHANGE_EMAIL.ATTEMPTS
+              value: '3'
+            - name: FE_ENDPOINT
+              value: 'http://localhost:3000'
+            - name: EMAIL_FROM
+              value: ''
+            - name: EMAIL_PASSWORD
+              value: ''

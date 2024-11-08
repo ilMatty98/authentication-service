@@ -15,6 +15,9 @@ import java.util.UUID;
 @Mapper(componentModel = "cdi")
 public interface AuthenticationMapper {
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "attempt", ignore = true)
+    @Mapping(target = "newEmail", ignore = true)
     @Mapping(target = "hint", source = "signUpDto.hint")
     @Mapping(target = "state", source = "userStateEnum")
     @Mapping(target = "email", source = "signUpDto.email")
