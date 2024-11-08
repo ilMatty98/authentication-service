@@ -106,7 +106,6 @@ jobs:
 
       # Step to upgrade the repository
       - name: Commit pom.xml, generate tag and Push
-        if: env.bump_type != 'none'  # Execute this step only if bump_type is not 'none'
         run: |
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
