@@ -1,0 +1,7 @@
+[
+  {
+    "name": "liquibase.command.core.StartH2CommandStep",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true
+  }
+]
