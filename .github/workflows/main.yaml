@@ -1,4 +1,4 @@
-name: Quarkus - Java GraalVM Native JAVA 17 with Maven # Name of the workflow
+name: Quarkus CI/CD Pipeline - GraalVM Native Build (Java 17, Maven) # Name of the workflow
 
 on:
   pull_request: # Trigger the workflow on pull requests
