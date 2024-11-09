@@ -124,12 +124,12 @@ jobs:
         env:
           NEW_VERSION: ${{ env.new_version }}
 
-      # Step to Commit pom.xml and Push
-      - name: Commit pom.xml and Push
+      # Step to Commit and Push the new version of pom.xml
+      - name: Commit and Push the new version of pom.xml
         run: |
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
-          git pull origin HEAD:refs/heads/${{ github.head_ref }}
+          git pull origin HEAD:refs/heads/${{ github.head_ref }} --no-rebase
           git add pom.xml
           git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
           git push -f origin HEAD:refs/heads/${{ github.head_ref }}
@@ -143,6 +143,7 @@ jobs:
         run: |
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
+          git pull origin HEAD:refs/heads/${{ github.head_ref }} --no-rebase
           git tag -a "v${{ env.NEW_VERSION }}" -m "Release version ${{ env.NEW_VERSION }}"
           git push origin "v${{ env.NEW_VERSION }}"
         env:
