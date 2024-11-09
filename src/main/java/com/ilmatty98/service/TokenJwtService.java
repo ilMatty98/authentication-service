@@ -14,7 +14,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
-import java.security.Provider;
 import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -40,10 +39,6 @@ public class TokenJwtService {
 
     @Startup
     void init() {
-        log.info("List of providers:");
-        for (Provider provider : Security.getProviders()) {
-            log.info(provider.getName());
-        }
         generateKeyPair();
     }
 
