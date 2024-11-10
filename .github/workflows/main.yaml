@@ -10,11 +10,6 @@ permissions:
 
 jobs:
   build:
-    # Condition to run the job: only if the source branch starts with 'develop/', 'feature/', or 'fix/'
-    if: |
-      startsWith(github.head_ref, 'develop/') ||
-      startsWith(github.head_ref, 'feature/') ||
-      startsWith(github.head_ref, 'fix/')
     runs-on: ubuntu-latest  # Specify the OS for the runner (ubuntu-latest)
 
     steps:
