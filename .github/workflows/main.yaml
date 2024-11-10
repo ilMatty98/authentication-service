@@ -49,6 +49,10 @@ jobs:
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
 
+          # Ensure the main branch is up to date
+          git checkout main
+          git pull origin main
+
           # Create a new branch for the changes
           git checkout -b version-update-${{ env.NEW_VERSION }}
 
@@ -71,6 +75,8 @@ jobs:
           # Clean up: delete the remote branch after pull request is merged or closed
           git push origin --delete version-update-${{ env.NEW_VERSION }}
 
+          # Optional: Remove the worktree if used
+          git worktree remove /home/runner/work/***/***
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}  # Token for authentication
           NEW_VERSION: ${{ env.NEW_VERSION }}  # The new version calculated earlier
