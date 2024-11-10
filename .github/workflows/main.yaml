@@ -42,11 +42,15 @@ jobs:
         env:
           NEW_VERSION: ${{ env.new_version }}
 
-      # Step to Commit, Tag and Push the new version of pom.xml
-      - name: Commit, Tag and Push the new version of pom.xml
+      # Step to Commit, Tag, Push and Create Pull Request
+      - name: Commit, Tag, Push and Create Pull Request
         run: |
+          # Set up Git config
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
+
+          # Create a new branch for the changes
+          git checkout -b version-update-${{ env.NEW_VERSION }}
 
           # Commit changes to pom.xml
           git add pom.xml
@@ -55,8 +59,18 @@ jobs:
           # Create a new tag
           git tag -a "v${{ env.NEW_VERSION }}" -m "Release version ${{ env.NEW_VERSION }}"
 
-          # Push commit and tag to the repository
-          git push origin HEAD:refs/heads/main --tags
+          # Push the new branch and the tag
+          git push origin version-update-${{ env.NEW_VERSION }} --tags
+
+          # Create a Pull Request to merge changes into main
+          gh pr create --base main --head version-update-${{ env.NEW_VERSION }} --title "Release version ${{ env.NEW_VERSION }}" --body "Version update to ${{ env.NEW_VERSION }}"
+
+          # Clean up: delete the local branch after push
+          git branch -D version-update-${{ env.NEW_VERSION }}
+
+          # Clean up: delete the remote branch after pull request is merged or closed
+          git push origin --delete version-update-${{ env.NEW_VERSION }}
+
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}  # Token for authentication
           NEW_VERSION: ${{ env.NEW_VERSION }}  # The new version calculated earlier
