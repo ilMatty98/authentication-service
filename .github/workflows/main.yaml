@@ -50,10 +50,16 @@ jobs:
           
           # Pull the latest changes from the remote main branch
           git pull origin main --rebase
-
-          # Commit changes to pom.xml
-          git add pom.xml
-          git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
+          
+          # Check if there are changes to commit
+          git diff --exit-code || (
+            # Commit changes to pom.xml
+            git add pom.xml
+            git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
+          
+            # Push commit and tag to the repository
+            git push origin HEAD:refs/heads/main
+          )
 
           # Create a new tag
           git tag -a "v${{ env.NEW_VERSION }}" -m "Release version ${{ env.NEW_VERSION }}"
