@@ -117,7 +117,10 @@ jobs:
       # Step to build Docker image
       - name: Build Docker image
         run: |
+          # Builds the image with the specific version
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }} .
+          # Also tag the image as "latest"
+          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:latest
         env:
           DOCKER_BUILDKIT: 1  # Optional for enhanced Docker build performance
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -126,8 +129,12 @@ jobs:
       # Step to push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
+          # Log in to Docker Hub
           docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+          # Push the image with the specific tag (version)
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          # Also push the image with the "latest" tag
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:latest
         env:
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
