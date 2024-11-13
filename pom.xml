@@ -71,10 +71,10 @@
             <artifactId>quarkus-security</artifactId>
         </dependency>
 
-        <!-- postgresql -->
+        <!-- oracle -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
+            <artifactId>quarkus-jdbc-oracle</artifactId>
         </dependency>
 
         <!-- liquibase -->
