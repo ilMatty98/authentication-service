@@ -89,3 +89,16 @@ docker run -d \
   postgres
 
 ```
+
+## Start container oracle
+
+```shell script
+docker run -d -p 1521:1521 -p 5500:5500 \
+    --name oracle \
+    --shm-size=2g \
+    -e ORACLE_PASSWORD=oracle \
+    -e ORACLE_CHARACTERSET=AL32UTF8 \
+    oracleinanutshell/oracle-xe-11g
+
+    
+```
