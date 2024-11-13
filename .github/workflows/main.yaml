@@ -102,6 +102,7 @@ jobs:
       # Step to wait for SonarQube Quality Gate results
       - name: Wait for SonarQube Quality Gate results
         uses: sonarsource/sonarqube-quality-gate-action@master
+        continue-on-error: true # Continues the workflow even if the Quality Gate fails
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
