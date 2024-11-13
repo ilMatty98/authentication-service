@@ -19,16 +19,16 @@ public class User {
     @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "salt", nullable = false)
+    @Column(name = "salt", length = 500, nullable = false)
     private String salt;
 
-    @Column(name = "hash", nullable = false)
+    @Column(name = "hash", length = 500, nullable = false)
     private String hash;
 
-    @Column(name = "protected_symmetric_key", nullable = false)
+    @Column(name = "protected_symmetric_key", length = 500, nullable = false)
     private String protectedSymmetricKey;
 
-    @Column(name = "initialization_vector", nullable = false)
+    @Column(name = "initialization_vector", length = 500, nullable = false)
     private String initializationVector;
 
     @Column(name = "timestamp_creation", nullable = false)
@@ -46,7 +46,7 @@ public class User {
     @Column(name = "hint", length = 100, nullable = false)
     private String hint;
 
-    @Column(name = "propic", nullable = false)
+    @Column(name = "propic", length = 500, nullable = false)
     private String propic;
 
     @Column(name = "language", length = 2, nullable = false)

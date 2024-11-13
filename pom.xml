@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ilmatty98</groupId>
     <artifactId>authentication-service</artifactId>
-    <version>0.2.2</version>
+    <version>1.0.0-SNAPSHOT1</version>
 
     <properties>
         <compiler-plugin.version>3.12.1</compiler-plugin.version>
@@ -71,10 +71,10 @@
             <artifactId>quarkus-security</artifactId>
         </dependency>
 
-        <!-- postgresql -->
+        <!-- oracle -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
+            <artifactId>quarkus-jdbc-oracle</artifactId>
         </dependency>
 
         <!-- liquibase -->
