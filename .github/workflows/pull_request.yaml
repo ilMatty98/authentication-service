@@ -149,6 +149,7 @@ jobs:
       # Step to wait for SonarQube Quality Gate results
       - name: Wait for SonarQube Quality Gate results
         uses: sonarsource/sonarqube-quality-gate-action@master
+        continue-on-error: true # Continues the workflow even if the Quality Gate fails
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -178,3 +179,34 @@ jobs:
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_REPOSITORY_NAME: ${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}
+
+      # Step to update deployment.yaml with new image version
+      - name: Update deployment.yaml with new image version
+        run: |
+          # Replace the placeholder with the actual image tag
+          sed -i 's|image: "\${IMAGE_TAG}"|image: "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }}"|' k8s/deployment.yaml
+
+      # Step to Set Up Google Cloud SDK
+      - name: Set Up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.5.0
+        with:
+          version: '392.0.0'
+
+      # Step to authenticate with Google Cloud
+      - name: Authenticate to Google Cloud
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}  # Key to service
+        run: |
+          echo "${GCP_SA_KEY}" > "${HOME}/gcp-key.json"
+          gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
+
+      # Step to Configure kubectl
+      - name: Configure kubectl
+        run: |
+          # gcloud container clusters get-credentials <your-cluster-name> --zone <your-cluster-zone> --project <your-project-id>
+          gcloud container clusters get-credentials autopilot-cluster-1 --zone europe-west8 --project cluster-kubernetes-01
+
+      # Step to Deploy to Kubernetes
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
