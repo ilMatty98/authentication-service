@@ -206,7 +206,6 @@ jobs:
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
-          credentials: ${{ secrets.GKE_SA_KEY }}
 
       # Deploy to GKE
       - name: Deploy to GKE
