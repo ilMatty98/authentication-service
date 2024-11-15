@@ -211,5 +211,5 @@ jobs:
       - name: Deploy to GKE
         run: |
           kubectl apply -f k8s/deployment.yaml
-          kubectl rollout status deployment/${{ secrets.GKE_DEPLOYMENT_NAME }}
+          kubectl rollout status deployment/${{ secrets.GKE_DEPLOYMENT_NAME }} -n=${{ secrets.GKE_NAMESPACE }}
           kubectl get services -o wide
