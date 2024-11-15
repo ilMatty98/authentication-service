@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentication-service-service # Name of service
+  namespace: ilmatty98 # Name of namespace
+  labels:
+    app: authentication-service # Name of deployment
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080 # Port on which the container exposes the service
+  selector:
+    app: authentication-service # Name of deployment
+  type: LoadBalancer # Type of service
