@@ -186,7 +186,6 @@ jobs:
           # Replace the placeholder with the actual image tag
           sed -i 's|image: "\${IMAGE_TAG}"|image: "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }}"|' k8s/deployment.yaml
 
-
       # Step to Authenticate with Google Cloud using Service Account Key
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2

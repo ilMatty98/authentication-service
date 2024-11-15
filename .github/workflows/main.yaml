@@ -139,27 +139,29 @@ jobs:
           # Replace the placeholder with the actual image tag
           sed -i 's|image: "\${IMAGE_TAG}"|image: "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }}"|' k8s/deployment.yaml
 
+      # Step to Authenticate with Google Cloud using Service Account Key
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GKE_SA_KEY }}
+
       # Step to Set Up Google Cloud SDK
       - name: Set Up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.5.0
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          version: '392.0.0'
+          project_id: ${{ secrets.GKE_PROJECT }}
+          version: latest
 
-      # Step to authenticate with Google Cloud
-      - name: Authenticate to Google Cloud
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}  # Key to service
-        run: |
-          echo "${GCP_SA_KEY}" > "${HOME}/gcp-key.json"
-          gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
+      # Get the GKE credentials, so we can deploy to the cluster
+      - name: Get the GKE credentials
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
 
-      # Step to Configure kubectl
-      - name: Configure kubectl
-        run: |
-          # gcloud container clusters get-credentials <your-cluster-name> --zone <your-cluster-zone> --project <your-project-id>
-          gcloud container clusters get-credentials autopilot-cluster-1 --zone europe-west8 --project cluster-kubernetes-01
-
-      # Step to Deploy to Kubernetes
-      - name: Deploy to Kubernetes
+      # Deploy to GKE
+      - name: Deploy to GKE
         run: |
           kubectl apply -f k8s/deployment.yaml
+          kubectl rollout status deployment/${{ secrets.GKE_DEPLOYMENT_NAME }} -n=${{ secrets.GKE_NAMESPACE }}
+          kubectl get services -o wide
