@@ -10,9 +10,6 @@ COPY --chown=quarkus:quarkus .mvn /code/.mvn
 # Copy the pom.xml file to specify dependencies
 COPY --chown=quarkus:quarkus pom.xml /code/
 
-# Copy the resources configuration file (resource-config.json)
-COPY --chown=quarkus:quarkus src/main/resources/resource-config.json /code/src/main/resources/resource-config.json
-
 # Set the user to quarkus for security purposes
 USER quarkus
 # Set the working directory to /code
@@ -31,8 +28,7 @@ RUN ls -latr ./mvnw
 COPY src /code/src
 
 # Build the application in native mode
-# Include the resource configuration file during the build
-RUN ./mvnw package -Pnative -Dquarkus.native.additional-build-args="-H:ResourceConfigurationFiles=/code/src/main/resources/resource-config.json"
+RUN ./mvnw package -Pnative
 
 ## Stage 2 : create the docker final image
 # Use a lightweight Quarkus image to run the native application
