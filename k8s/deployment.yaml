@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service # Name of deployment
+  namespace: ilmatty98 # Name of namespace
+  labels:
+    app: authentication-service
+spec:
+  replicas: 1 # Number of replicas on pod
+  selector:
+    matchLabels:
+      app: authentication-service
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - name: authentication-service # Name of container
+          image: "${IMAGE_TAG}" # Image from docker hub
+          ports:
+            - containerPort: 8080 # Port on which the container exposes the service
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+            requests:
+              memory: "256Mi"
+              cpu: "0.5"
+          env: # Definition of environment variables
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: DB_URL
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: DB_PASSWORD
+            - name: SALT_SIZE
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: SALT_SIZE
+            - name: ARGON2ID_SIZE
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: ARGON2ID_SIZE
+            - name: ARGON2ID_ITERATIONS
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: ARGON2ID_ITERATIONS
+            - name: ARGON2ID_MEMORYKB
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: ARGON2ID_MEMORYKB
+            - name: ARGON2ID_PARALLELISM
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: ARGON2ID_PARALLELISM
+            - name: TOKEN_ROTATION_CRON
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: TOKEN_ROTATION_CRON
+            - name: TOKEN_EXPIRATION_MINUTES
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: TOKEN_EXPIRATION_MINUTES
+            - name: CHANGE_EMAIL_EXPIRATION_MINUTES
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: CHANGE_EMAIL_EXPIRATION_MINUTES
+            - name: CHANGE_EMAIL_ATTEMPTS
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: CHANGE_EMAIL_ATTEMPTS
+            - name: FE_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: FE_ENDPOINT
+            - name: EMAIL_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: EMAIL_FROM
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentication-service-secrets
+                  key: EMAIL_PASSWORD

@@ -4,73 +4,44 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <changeSet id="1" author="ilMatty98">
-        <createTable tableName="users">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="users_id_pk"/>
-            </column>
-            <column name="email" type="varchar(100)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="salt" type="text">
-                <constraints nullable="false"/>
-            </column>
-            <column name="hash" type="text">
-                <constraints nullable="false"/>
-            </column>
-            <column name="protected_symmetric_key" type="text">
-                <constraints nullable="false"/>
-            </column>
-            <column name="initialization_vector" type="text">
-                <constraints nullable="false"/>
-            </column>
-            <column name="timestamp_creation" type="timestamp">
-                <constraints nullable="false"/>
-            </column>
-            <column name="timestamp_last_access" type="timestamp">
-                <constraints nullable="false"/>
-            </column>
-            <column name="timestamp_password" type="timestamp">
-                <constraints nullable="false"/>
-            </column>
-            <column name="timestamp_email" type="timestamp">
-                <constraints nullable="false"/>
-            </column>
-            <column name="hint" type="varchar(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="propic" type="text">
-                <constraints nullable="false"/>
-            </column>
-            <column name="language" type="varchar(2)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="state" type="varchar(10)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="verification_code" type="varchar(36)"/>
-            <column name="attempt" type="int"/>
-            <column name="new_email" type="varchar(100)"/>
-        </createTable>
+        <!-- Create the sequence for the auto increment -->
+        <sql>
+            CREATE SEQUENCE users_seq START WITH 1;
+        </sql>
+
+        <!-- Create table users -->
+        <sql>
+            create table USERS
+            (
+                ID                      NUMBER(38) DEFAULT users_seq.nextval NOT NULL,
+                EMAIL                   VARCHAR2(100) NOT NULL UNIQUE,
+                SALT                    CLOB         NOT NULL,
+                HASH                    CLOB         NOT NULL,
+                PROTECTED_SYMMETRIC_KEY CLOB         NOT NULL,
+                INITIALIZATION_VECTOR   CLOB         NOT NULL,
+                TIMESTAMP_CREATION      TIMESTAMP(6) NOT NULL,
+                TIMESTAMP_LAST_ACCESS   TIMESTAMP(6) NOT NULL,
+                TIMESTAMP_PASSWORD      TIMESTAMP(6) NOT NULL,
+                TIMESTAMP_EMAIL         TIMESTAMP(6) NOT NULL,
+                HINT                    VARCHAR2(100) NOT NULL,
+                PROPIC                  CLOB         NOT NULL,
+                LANGUAGE                VARCHAR2(2) NOT NULL,
+                STATE                   VARCHAR2(10) NOT NULL,
+                VERIFICATION_CODE       VARCHAR2(36),
+                ATTEMPT                 NUMBER,
+                NEW_EMAIL               VARCHAR2(100)
+            )
+        </sql>
 
         <!-- Create the sequence for the auto increment -->
-        <createSequence sequenceName="users_id_seq" startValue="1" incrementBy="1"/>
-
-        <!-- Create the trigger to set the ID automatically with the sequence -->
         <sql>
-            CREATE
-            OR REPLACE TRIGGER users_id_trigger
-            BEFORE INSERT ON users
-            FOR EACH ROW
-            BEGIN
-                :NEW
-            .id := users_id_seq.NEXTVAL;
-            END;
+            ALTER TABLE USERS ADD (CONSTRAINT users_pk PRIMARY KEY (ID));
         </sql>
 
         <!-- Add a CHECK constraint on the 'state' column -->
         <sql>
-            ALTER TABLE users
-                ADD CONSTRAINT state_check CHECK (state IN ('UNVERIFIED', 'VERIFIED'));
+            ALTER TABLE USERS
+                ADD CONSTRAINT state_check CHECK (STATE IN ('UNVERIFIED', 'VERIFIED'));
         </sql>
     </changeSet>
 
