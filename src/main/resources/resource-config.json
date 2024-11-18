@@ -1,0 +1,22 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "email/label/.*"
+      },
+      {
+        "pattern": "email/template/.*"
+      },
+      {
+        "pattern": "src/main/resources/email/label/.*"
+      },
+      {
+        "pattern": "src/main/resources/email/template/.*"
+      },
+      {
+        "pattern": ".*"
+      }
+    ],
+    "excludes": []
+  }
+}
