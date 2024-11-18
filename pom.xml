@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ilmatty98</groupId>
     <artifactId>authentication-service</artifactId>
-    <version>1.0.1-SNAPSHOT18</version>
+    <version>1.0.1-SNAPSHOT19</version>
 
     <properties>
         <compiler-plugin.version>3.12.1</compiler-plugin.version>
