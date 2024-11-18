@@ -9,6 +9,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ public class EmailService {
     public void sendEmail(String email, String language, EmailTypeEnum emailTypeEnum, Map<String, String> dynamicLabels) {
         try {
             log.warn("Init sending email to {}", email);
+            printFilesFromResources("");
             var labelsInputStream = getClass().getClassLoader().getResourceAsStream(emailTypeEnum.getLabelLocation());
             var labels = objectMapper.readValue(labelsInputStream, EmailTemplateDto.class);
             dynamicLabels.forEach((k, v) -> labels.getTemplate().put(k, Collections.singletonMap(DEFAULT_LANGUAGE, v)));
@@ -80,6 +83,47 @@ public class EmailService {
             return substrings;
         } catch (Exception e) {
             return Collections.emptyList();
+        }
+    }
+
+
+    public static void printFilesFromResources(String folderPath) {
+        try {
+            Enumeration<URL> resources = EmailService.class.getClassLoader().getResources(folderPath);
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                File folder = new File(resource.toURI());
+
+                // Iniziamo la scansione ricorsiva dalla cartella principale
+                if (folder.exists() && folder.isDirectory()) {
+                    scanFolder(folder);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error while accessing resources", e);
+            System.out.println("Error while accessing resources: " + e.getMessage());
+        }
+    }
+
+    // Metodo ricorsivo per esplorare le cartelle
+    private static void scanFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    // Se il file è una cartella, esplora ricorsivamente
+                    log.info("Directory found: {}", file.getAbsolutePath());
+                    System.out.println("Directory found: " + file.getAbsolutePath());
+                    scanFolder(file);  // Scansione ricorsiva della sottocartella
+                } else {
+                    // Se è un file, logga il nome completo
+                    log.info("File found: {}", file.getAbsolutePath());
+                    System.out.println("File found: " + file.getAbsolutePath());
+                }
+            }
+        } else {
+            log.warn("No files found in the folder: {}", folder.getPath());
+            System.out.println("No files found in the folder: " + folder.getPath());
         }
     }
 }
