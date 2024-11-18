@@ -24,7 +24,7 @@ public enum EmailTypeEnum {
     @UtilityClass
     public static class EmailConstants {
 
-        private static final String BASE_PATH = "src/main/resources/email/";
+        private static final String BASE_PATH = "email/";
         private static final String BASE_PATH_LABEL = BASE_PATH + "label/";
         private static final String BASE_PATH_TEMPLATE = BASE_PATH + "template/";
 

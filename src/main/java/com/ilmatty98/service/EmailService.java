@@ -1,5 +1,6 @@
 package com.ilmatty98.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ilmatty98.constants.EmailTypeEnum;
 import com.ilmatty98.dto.EmailTemplateDto;
@@ -8,10 +9,11 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -35,9 +37,12 @@ public class EmailService {
     public void sendEmail(String email, String language, EmailTypeEnum emailTypeEnum, Map<String, String> dynamicLabels) {
         try {
             log.warn("Init sending email to {}", email);
-            var labels = objectMapper.readValue(Paths.get(emailTypeEnum.getLabelLocation()).toFile(), EmailTemplateDto.class);
+//            printFilesFromResources("");
+            var labelsInputStream = ClassLoader.getSystemResourceAsStream(emailTypeEnum.getLabelLocation());
+            var labels = objectMapper.readValue(labelsInputStream, EmailTemplateDto.class);
             dynamicLabels.forEach((k, v) -> labels.getTemplate().put(k, Collections.singletonMap(DEFAULT_LANGUAGE, v)));
-            var template = FileUtils.readFileToString(Paths.get(emailTypeEnum.getTemplateLocation()).toFile(), StandardCharsets.UTF_8);
+            var templateInputStream = TypeReference.class.getClassLoader().getResourceAsStream(emailTypeEnum.getTemplateLocation());
+            var template = new String(templateInputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             var subject = getValue(labels.getSubject(), language);
             var body = fillTemplate(labels.getTemplate(), template, language);
@@ -82,4 +87,52 @@ public class EmailService {
             return Collections.emptyList();
         }
     }
+
+
+    public static void scanFolder(File folder) {
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        // Se è una sottocartella, chiamare ricorsivamente scanFolder
+                        scanFolder(file);
+                    } else {
+                        // Log del file trovato con il percorso completo
+                        log.info("File found: {}", file.getAbsolutePath());
+                        System.out.println("File found: " + file.getAbsolutePath());
+                    }
+                }
+            }
+        }
+    }
+
+    public static void printFilesFromResources(String folderPath) {
+        try {
+            Enumeration<URL> resources = EmailService.class.getClassLoader().getResources(folderPath);
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                File folder = new File(resource.toURI());
+
+                // Iniziamo la scansione ricorsiva dalla cartella principale
+                if (folder.exists() && folder.isDirectory()) {
+                    scanFolder(folder);  // Chiamata al metodo scanFolder per la scansione ricorsiva
+                } else {
+                    // Se non è una directory, tenta di caricare la risorsa con getResourceAsStream
+                    InputStream resourceStream = EmailService.class.getResourceAsStream("/" + folderPath);
+                    if (resourceStream != null) {
+                        log.info("Resource found: {}", folderPath);
+                        System.out.println("Resource found: " + folderPath);
+                    } else {
+                        log.warn("Resource not found: {}", folderPath);
+                        System.out.println("Resource not found: " + folderPath);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error while accessing resources", e);
+            System.out.println("Error while accessing resources: " + e.getMessage());
+        }
+    }
+
 }
