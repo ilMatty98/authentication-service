@@ -8,10 +8,8 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -35,9 +33,11 @@ public class EmailService {
     public void sendEmail(String email, String language, EmailTypeEnum emailTypeEnum, Map<String, String> dynamicLabels) {
         try {
             log.warn("Init sending email to {}", email);
-            var labels = objectMapper.readValue(Paths.get(emailTypeEnum.getLabelLocation()).toFile(), EmailTemplateDto.class);
+            var labelsInputStream = getClass().getClassLoader().getResourceAsStream(emailTypeEnum.getLabelLocation());
+            var labels = objectMapper.readValue(labelsInputStream, EmailTemplateDto.class);
             dynamicLabels.forEach((k, v) -> labels.getTemplate().put(k, Collections.singletonMap(DEFAULT_LANGUAGE, v)));
-            var template = FileUtils.readFileToString(Paths.get(emailTypeEnum.getTemplateLocation()).toFile(), StandardCharsets.UTF_8);
+            var templateInputStream = getClass().getClassLoader().getResourceAsStream(emailTypeEnum.getTemplateLocation());
+            var template = new String(templateInputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             var subject = getValue(labels.getSubject(), language);
             var body = fillTemplate(labels.getTemplate(), template, language);
