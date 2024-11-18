@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authentication-service-ingress # Name of ingress
+  namespace: ilmatty98  # Name of namespace
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: authentication-service.ilmatty98.it  # Domain url
+      http:
+        paths:
+          - path: /   # Indicates that all requests to the domain are forwarded to the service
+            pathType: Prefix
+            backend:
+              service:
+                name: authentication-service-service # Name of service
+                port:
+                  number: 80
