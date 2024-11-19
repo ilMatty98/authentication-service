@@ -1,0 +1,220 @@
+name: Quarkus CI/CD Pipeline - GraalVM Native Build (Java 17, Maven) # Name of the workflow
+
+# Workflow disabled
+on:
+  push:
+    branches:
+      - non-existent-branch
+
+#on:
+#  pull_request: # Trigger the workflow on pull requests
+#    branches:
+#      - main  # Run the workflow only if the pull request is targeted to the 'main' branch
+#    types:
+#      - opened  # Run the workflow when a pull request is opened
+#      - synchronize  # Run the workflow when a pull request is updated
+
+permissions:
+  contents: write # Allows to write to the repository
+
+jobs:
+  build:
+    # Condition to run the job: only if the source branch starts with 'develop/', 'feature/', or 'fix/'
+    if: |
+      startsWith(github.head_ref, 'develop/') ||
+      startsWith(github.head_ref, 'feature/') ||
+      startsWith(github.head_ref, 'fix/')
+    runs-on: ubuntu-latest  # Specify the OS for the runner (ubuntu-latest)
+
+    steps:
+      # Step to check out the code from the repository
+      - name: Checkout code the code from the repository
+        uses: actions/checkout@v4
+
+      # Step to Set up GraalVM 17
+      - name: Set up GraalVM 17
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17.0.12'
+          distribution: 'graalvm'
+          native-image-job-reports: 'true'
+
+      # Step to determine which part of the version to update based on the starting branch
+      - name: Determine which part of the version to update based on the starting branch
+        id: version_bump
+        run: |
+          case "${{ github.event.action }}" in
+            opened)
+              case "${{ github.head_ref }}" in
+                develop/*) echo "bump_type=major" >> $GITHUB_ENV ;;
+                feature/*) echo "bump_type=minor" >> $GITHUB_ENV ;;
+                fix/*) echo "bump_type=patch" >> $GITHUB_ENV ;;
+                *) echo "bump_type=none" >> $GITHUB_ENV ;;  # Fallback if no match
+              esac
+              ;;
+            *)
+              echo "bump_type=none" >> $GITHUB_ENV  # If not opened, set to none
+              ;;
+          esac
+
+      # Step to upgrade the version in pom.xml if pull request is opened
+      - name: Upgrade version in pom.xml if pull request is opened
+        if: github.event.action == 'opened'
+        run: |
+          # Extract current version from pom.xml
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+          # Split the version into major, minor, and patch
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+
+          # Increment version based on bump type
+          if [ "$bump_type" == "major" ]; then
+            NEW_VERSION=$((major + 1)).0.0
+          elif [ "$bump_type" == "minor" ]; then
+            NEW_VERSION=$major.$((minor + 1)).0
+          else
+            NEW_VERSION=$major.$minor.$((patch + 1))
+          fi
+
+          # Update version in pom.xml
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
+
+          # Export the new version as an environment variable
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        env:
+          NEW_VERSION: ${{ env.new_version }}
+
+      # Step to add or increment -SNAPSHOT suffix if pull request is opened or synchronize
+      - name: Add or increment -SNAPSHOT suffix if pull request is opened or synchronize
+        if: github.event.action == 'opened' || github.event.action == 'synchronize'
+        run: |
+          # Extract current version from pom.xml
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+          # Check if the current version already has a -SNAPSHOT suffix with a number
+          if [[ $CURRENT_VERSION =~ (.*)-SNAPSHOT([0-9]+)$ ]]; then
+            BASE_VERSION="${BASH_REMATCH[1]}"
+            SNAPSHOT_NUM=$((BASH_REMATCH[2] + 1))
+          else
+            BASE_VERSION="${CURRENT_VERSION%-SNAPSHOT*}"
+            SNAPSHOT_NUM=1
+          fi
+
+          # Append or increment -SNAPSHOT version
+          NEW_VERSION="${BASE_VERSION}-SNAPSHOT${SNAPSHOT_NUM}"
+
+          # Update version in pom.xml
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
+
+          # Export the new version as an environment variable
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        env:
+          NEW_VERSION: ${{ env.new_version }}
+
+      # Step to Commit and Push the new version of pom.xml
+      - name: Commit and Push the new version of pom.xml
+        run: |
+          git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
+          git add pom.xml
+          git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
+          git push -f origin HEAD:refs/heads/${{ github.head_ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}  # Token for authentication
+          NEW_VERSION: ${{ env.NEW_VERSION }}  # The new version calculated earlier
+
+      # Step to Cache Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository  # Path to the cache location (where Maven stores dependencies)
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Unique cache key based on OS and pom.xml content
+          restore-keys: |
+            ${{ runner.os }}-maven-  # Fallback key based on OS only
+
+      # Step to run tests in native mode with Maven and generate a coverage report with Jacoco
+      - name: Run tests in native mode with Maven and generate a coverage report with Jacoco
+        run: mvn clean verify jacoco:report -Pnative
+
+      # Step to perform code quality analysis with SonarQube
+      - name: Perform code quality analysis with SonarQube
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Authentication token for SonarQube
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # URL of the SonarQube server
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.branch.name=master
+            -Dsonar.java.binaries=target/classes
+            -Dsonar.sources=src
+            -Dsonar.coverage.exclusions=**/test/**/*
+            -Dsonar.exclusions=**/test/**/*
+
+      # Step to wait for SonarQube Quality Gate results
+      - name: Wait for SonarQube Quality Gate results
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        continue-on-error: true # Continues the workflow even if the Quality Gate fails
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # Step to extract version from pom.xml
+      - name: Extract version from pom.xml
+        id: get_version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # Step to build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }} .
+        env:
+          DOCKER_BUILDKIT: 1  # Optional for enhanced Docker build performance
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_REPOSITORY_NAME: ${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}
+
+      # Step to push Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+        env:
+          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_REPOSITORY_NAME: ${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}
+
+      # Step to update deployment.yaml with new image version
+      - name: Update deployment.yaml with new image version
+        run: |
+          # Replace the placeholder with the actual image tag
+          sed -i 's|image: "\${IMAGE_TAG}"|image: "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }}"|' k8s/deployment.yaml
+
+      # Step to Authenticate with Google Cloud using Service Account Key
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GKE_SA_KEY }}
+
+      # Step to Set Up Google Cloud SDK
+      - name: Set Up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GKE_PROJECT }}
+          version: latest
+
+      # Get the GKE credentials, so we can deploy to the cluster
+      - name: Get the GKE credentials
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+
+      # Deploy to GKE
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl rollout status deployment/${{ secrets.GKE_DEPLOYMENT_NAME }} -n=${{ secrets.GKE_NAMESPACE }}
+          kubectl get services -o wide
