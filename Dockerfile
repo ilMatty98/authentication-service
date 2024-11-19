@@ -20,7 +20,7 @@ RUN ./mvnw dependency:go-offline -B
 COPY src /code/src
 
 # Package the application
-RUN ./mvnw clean package
+RUN ./mvnw clean package -Dquarkus.package.type=uber-jar
 
 ## Stage 2: Run the application using a lightweight Java 21 runtime image
 # Use a lightweight runtime image with Java 21
