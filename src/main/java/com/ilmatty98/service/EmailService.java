@@ -9,6 +9,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -31,11 +33,13 @@ public class EmailService {
     public void sendEmail(String email, String language, EmailTypeEnum emailTypeEnum, Map<String, String> dynamicLabels) {
         try {
             log.warn("Init sending email to {}", email);
-            var labelsInputStream = ClassLoader.getSystemResourceAsStream(emailTypeEnum.getLabelLocation());
+
+            var labelsInputStream = getResourceAsStreamOrThrow(emailTypeEnum.getLabelLocation());
             var labels = objectMapper.readValue(labelsInputStream, EmailTemplateDto.class);
             dynamicLabels.forEach((k, v) -> labels.getTemplate().put(k, Collections.singletonMap(DEFAULT_LANGUAGE, v)));
-            var templateInputStream = ClassLoader.getSystemResourceAsStream(emailTypeEnum.getTemplateLocation());
-            var template = objectMapper.readValue(templateInputStream, String.class);
+
+            var templateInputStream = getResourceAsStreamOrThrow(emailTypeEnum.getTemplateLocation());
+            var template = new String(templateInputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             var subject = getValue(labels.getSubject(), language);
             var body = fillTemplate(labels.getTemplate(), template, language);
@@ -79,6 +83,11 @@ public class EmailService {
         } catch (Exception e) {
             return Collections.emptyList();
         }
+    }
+
+    private InputStream getResourceAsStreamOrThrow(String resourcePath) {
+        return Optional.ofNullable(ClassLoader.getSystemResourceAsStream(resourcePath))
+                .orElseThrow(() -> new IllegalArgumentException("Resource not found: " + resourcePath));
     }
 
 }
