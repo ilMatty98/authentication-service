@@ -1,9 +1,15 @@
 name: Quarkus CI/CD Pipeline - GraalVM Native Build (Java 17, Maven) # Name of the workflow
 
+# Workflow disabled
 on:
-  push: # Trigger the workflow on push events
+  push:
     branches:
-      - main  # Run the workflow only when there's a push to the 'main' branch
+      - non-existent-branch
+
+#on:
+#  push: # Trigger the workflow on push events
+#    branches:
+#      - main  # Run the workflow only when there's a push to the 'main' branch
 
 permissions:
   contents: write # Allows to write to the repository

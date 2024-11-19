@@ -186,7 +186,7 @@ class SignUpTest extends AuthenticationServiceTests {
 
         given()
                 .contentType(ContentType.JSON)
-                .body(new SignUpDto())
+                .body(signUp)
                 .when()
                 .post(SIGN_UP_URL)
                 .then()
