@@ -1,5 +1,7 @@
 package com.ilmatty98;
 
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.entity.User;
@@ -14,6 +16,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import lombok.SneakyThrows;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -32,6 +35,7 @@ import static io.restassured.RestAssured.given;
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AuthenticationServiceTests extends ApiTestConstants {
+
     @Inject
     protected EmailService emailService;
 
@@ -47,6 +51,11 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     @ConfigProperty(name = "token.expiration-minutes")
     protected long tokenExpiration;
 
+    @ConfigProperty(name = "quarkus.mailer.from")
+    protected String emailFrom;
+
+    protected static GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP);
+
     private static final Random random = new Random();
 
     @BeforeEach
@@ -54,6 +63,17 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     public void cleanRepository() {
         userRepository.deleteAll();
     }
+
+    @BeforeEach
+    void startGreenEmail() {
+        greenMail.start();
+    }
+
+    @AfterEach
+    void stopGreenEmail() {
+        greenMail.stop();
+    }
+
 
     protected static String generateRandomString(int length) {
         int leftLimit = 48; // numeral '0'
