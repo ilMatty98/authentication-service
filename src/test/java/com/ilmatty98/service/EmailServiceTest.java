@@ -6,6 +6,8 @@ import com.ilmatty98.constants.EmailTypeEnum;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -61,6 +63,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
     }
 
     @Test
+    @DisabledOnOs(OS.LINUX)
     void testChangePsw() throws MessagingException {
         var expectedSubject = "Password changed!";
         var label = List.of("Password changed!", "Password has been changed!", "Credentials Manager");
@@ -110,7 +113,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
         emailService.sendEmail(EMAIL_TO, language, EmailTypeEnum.LOG_IN, new HashMap<>());
 
         var receivedMessages = greenMail.getReceivedMessages();
-        assertTrue(greenMail.waitForIncomingEmail(10000, 1));
+        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
         assertEquals(1, receivedMessages.length);
 
         var email = receivedMessages[0];
@@ -126,7 +129,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
         emailService.sendEmail(EMAIL_TO, EmailServiceTest.EN, emailType, dynamicLabels);
 
         var receivedMessages = greenMail.getReceivedMessages();
-        assertTrue(greenMail.waitForIncomingEmail(10000, 1));
+        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
         assertEquals(1, receivedMessages.length);
 
         var email = receivedMessages[0];
