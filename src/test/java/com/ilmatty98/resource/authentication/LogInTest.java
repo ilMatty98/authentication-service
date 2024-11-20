@@ -5,6 +5,7 @@ import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.dto.request.LogInDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import jakarta.mail.MessagingException;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,7 @@ import java.time.OffsetDateTime;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
@@ -186,7 +188,7 @@ class LogInTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testLogIn() {
+    void testLogIn() throws MessagingException {
         var user = signUp(EMAIL, PASSWORD);
         user = confirmEmail(EMAIL);
 
@@ -220,16 +222,16 @@ class LogInTest extends AuthenticationServiceTests {
 
         assertTrue(timestampLastAccess.after(timestampCreation));
 
-//        //Check email
-//        var receivedMessages = greenMail.getReceivedMessages();
-//        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
-//        assertEquals(2, receivedMessages.length);
-//
-//        var email = receivedMessages[1];
-//        assertEquals(1, email.getAllRecipients().length);
-//        assertEquals(emailFrom, email.getFrom()[0].toString());
-//        assertEquals(EMAIL, email.getAllRecipients()[0].toString());
-//        assertEquals("New access on Credential Manager!", email.getSubject());
+        //Check email
+        var receivedMessages = greenMail.getReceivedMessages();
+        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
+        assertEquals(2, receivedMessages.length);
+
+        var email = receivedMessages[1];
+        assertEquals(1, email.getAllRecipients().length);
+        assertEquals(emailFrom, email.getFrom()[0].toString());
+        assertEquals(EMAIL, email.getAllRecipients()[0].toString());
+        assertEquals("New access on Credential Manager!", email.getSubject());
     }
 
 }

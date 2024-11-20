@@ -6,6 +6,7 @@ import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.SignUpDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import jakarta.mail.MessagingException;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -228,7 +229,7 @@ class SignUpTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testSignUp() {
+    void testSignUp() throws MessagingException {
         var signUp = fillObject(new SignUpDto());
         signUp.setEmail(EMAIL);
         signUp.setLanguage(EN);
@@ -262,6 +263,17 @@ class SignUpTest extends AuthenticationServiceTests {
                     assertNull(user.getNewEmail());
                     assertNull(user.getAttempt());
                 }, Assertions::fail);
+
+        //Check email
+        var receivedMessages = greenMail.getReceivedMessages();
+        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
+        assertEquals(1, receivedMessages.length);
+
+        var email = receivedMessages[0];
+        assertEquals(1, email.getAllRecipients().length);
+        assertEquals(emailFrom, email.getFrom()[0].toString());
+        assertEquals(signUp.getEmail(), email.getAllRecipients()[0].toString());
+        assertEquals("Welcome to Credentials Manager!", email.getSubject());
     }
 
 }
