@@ -1,6 +1,7 @@
 package com.ilmatty98.resource.authentication;
 
 import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.LogInDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -8,6 +9,8 @@ import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @QuarkusTest
 class ConfirmEmailTest extends AuthenticationServiceTests {
@@ -58,26 +61,25 @@ class ConfirmEmailTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-//        Non riesco a recuperare il contesto di aggiornato da rest assured
-//        userRepository.findByEmail(EMAIL).ifPresentOrElse(u -> {
-//            assertEquals(user.getId(), u.getId());
-//            assertEquals(user.getEmail(), u.getEmail());
-//            assertEquals(user.getSalt(), u.getSalt());
-//            assertEquals(user.getHash(), u.getHash());
-//            assertEquals(user.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
-//            assertEquals(user.getInitializationVector(), u.getInitializationVector());
-//            assertEquals(getLocalDataTime(user.getTimestampCreation()), getLocalDataTime(u.getTimestampCreation()));
-//            assertEquals(getLocalDataTime(user.getTimestampLastAccess()), getLocalDataTime(u.getTimestampLastAccess()));
-//            assertEquals(getLocalDataTime(user.getTimestampPassword()), getLocalDataTime(u.getTimestampPassword()));
-//            assertEquals(getLocalDataTime(user.getTimestampEmail()), getLocalDataTime(u.getTimestampEmail()));
-//            assertEquals(user.getLanguage(), u.getLanguage());
-//            assertEquals(user.getHint(), u.getHint());
-//            assertEquals(user.getPropic(), u.getPropic());
-//            assertEquals(UserStateEnum.VERIFIED, u.getState());
-//            assertNull(u.getVerificationCode());
-//            assertNull(u.getNewEmail());
-//            assertNull(u.getAttempt());
-//        }, Assertions::fail);
+
+        var u = getUserById(user.getId());
+        assertEquals(user.getId(), u.getId());
+        assertEquals(user.getEmail(), u.getEmail());
+        assertEquals(user.getSalt(), u.getSalt());
+        assertEquals(user.getHash(), u.getHash());
+        assertEquals(user.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
+        assertEquals(user.getInitializationVector(), u.getInitializationVector());
+        assertEquals(getLocalDataTime(user.getTimestampCreation()), getLocalDataTime(u.getTimestampCreation()));
+        assertEquals(getLocalDataTime(user.getTimestampLastAccess()), getLocalDataTime(u.getTimestampLastAccess()));
+        assertEquals(getLocalDataTime(user.getTimestampPassword()), getLocalDataTime(u.getTimestampPassword()));
+        assertEquals(getLocalDataTime(user.getTimestampEmail()), getLocalDataTime(u.getTimestampEmail()));
+        assertEquals(user.getLanguage(), u.getLanguage());
+        assertEquals(user.getHint(), u.getHint());
+        assertEquals(user.getPropic(), u.getPropic());
+        assertEquals(UserStateEnum.VERIFIED, u.getState());
+        assertNull(u.getVerificationCode());
+        assertNull(u.getNewEmail());
+        assertNull(u.getAttempt());
     }
 
     @Test
