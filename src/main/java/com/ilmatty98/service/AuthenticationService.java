@@ -4,6 +4,7 @@ import com.ilmatty98.constants.EmailTypeEnum;
 import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.ChangePasswordDto;
+import com.ilmatty98.dto.request.DeleteDto;
 import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.dto.response.AccessDto;
@@ -181,6 +182,23 @@ public class AuthenticationService {
         var dynamicLabels = Map.ofEntries(entry("hint_value", user.getHint()));
         emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels);
         log.info("End sendHint for user {}", email);
+        return true;
+    }
+
+    @Transactional
+    public boolean deleteAccount(String email, DeleteDto deleteDto) {
+        log.info("Init deleteAccount for user {}", email);
+        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
+                .orElseThrow(() -> {
+                    log.warn("User {} not found", email);
+                    return new NotFoundException();
+                });
+
+        checkPassword(user, deleteDto.getMasterPasswordHash());
+
+        userRepository.delete(user);
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.DELETE_USER, new HashMap<>());
+        log.info("End deleteAccount for user {}", email);
         return true;
     }
 

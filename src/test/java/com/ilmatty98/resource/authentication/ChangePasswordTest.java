@@ -2,6 +2,7 @@ package com.ilmatty98.resource.authentication;
 
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.TokenClaimEnum;
+import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.ChangePasswordDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -186,28 +187,26 @@ class ChangePasswordTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-//        Non riesco a recuperare il contesto di aggiornato da rest assured
-//        userRepository.findByEmail(EMAIL)
-//                .ifPresentOrElse(u -> {
-//                    assertNotNull(u.getId());
-//                    assertEquals(user.getEmail(), u.getEmail());
-//                    assertNotNull(u.getSalt());
-//                    assertNotNull(u.getHash());
-//                    assertEquals(changePasswordDto.getNewProtectedSymmetricKey(), authenticationMapper.base64DecodingString(u.getProtectedSymmetricKey()));
-//                    assertEquals(changePasswordDto.getNewInitializationVector(), authenticationMapper.base64DecodingString(u.getInitializationVector()));
-//                    assertTrue(u.getTimestampPassword().after(user.getTimestampPassword()));
-//                    assertNotNull(u.getTimestampCreation());
-//                    assertNotNull(u.getTimestampLastAccess());
-//                    assertNotNull(u.getTimestampPassword());
-//                    assertNotNull(u.getTimestampEmail());
-//                    assertEquals(user.getLanguage(), u.getLanguage());
-//                    assertEquals(user.getHint(), u.getHint());
-//                    assertEquals(user.getPropic(), u.getPropic());
-//                    assertEquals(UserStateEnum.VERIFIED, u.getState());
-//                    assertNull(u.getVerificationCode());
-//                    assertNull(u.getNewEmail());
-//                    assertNull(u.getAttempt());
-//                }, Assertions::fail);
+        var u = getUserById(user.getId());
+        assertNotNull(u);
+        assertNotNull(u.getId());
+        assertEquals(user.getEmail(), u.getEmail());
+        assertNotNull(u.getSalt());
+        assertNotNull(u.getHash());
+        assertEquals(changePasswordDto.getNewProtectedSymmetricKey(), authenticationMapper.base64DecodingString(u.getProtectedSymmetricKey()));
+        assertEquals(changePasswordDto.getNewInitializationVector(), authenticationMapper.base64DecodingString(u.getInitializationVector()));
+        assertTrue(u.getTimestampPassword().after(user.getTimestampPassword()));
+        assertNotNull(u.getTimestampCreation());
+        assertNotNull(u.getTimestampLastAccess());
+        assertNotNull(u.getTimestampPassword());
+        assertNotNull(u.getTimestampEmail());
+        assertEquals(user.getLanguage(), u.getLanguage());
+        assertEquals(user.getHint(), u.getHint());
+        assertEquals(user.getPropic(), u.getPropic());
+        assertEquals(UserStateEnum.VERIFIED, u.getState());
+        assertNull(u.getVerificationCode());
+        assertNull(u.getNewEmail());
+        assertNull(u.getAttempt());
 
         //Check email
         var receivedMessages = greenMail.getReceivedMessages();

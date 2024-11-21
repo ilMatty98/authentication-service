@@ -160,6 +160,36 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         return userRepository.findByEmail(email).orElseGet(Assertions::fail);
     }
 
+    protected User getUserById(Long id) {
+        return given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/user/{id}", id)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .extract()
+                .as(User.class);
+    }
+
+    protected void saveUser(User user) {
+        given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .when()
+                .post("/user")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+    }
+
+    protected void deleteUserById(Long id) {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/user/{id}", id)
+                .then()
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+    }
+
     protected static LocalDateTime getLocalDataTime(Timestamp timestamp) {
         return Optional.ofNullable(timestamp)
                 .map(Timestamp::toLocalDateTime)

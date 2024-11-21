@@ -2,6 +2,7 @@ package com.ilmatty98.resource;
 
 import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.dto.request.ChangePasswordDto;
+import com.ilmatty98.dto.request.DeleteDto;
 import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.dto.response.AccessDto;
@@ -63,6 +64,16 @@ public class AuthenticationResource {
     @Path(SEND_HINT)
     public boolean sendHint(@RestPath String email) {
         return authenticationService.sendHint(email);
+    }
+
+    @DELETE
+    @BearerAuthenticated
+    @Path(DELETE_ACCOUNT)
+    public boolean deleteAccount(
+            @Valid @RequestBody DeleteDto deleteDto,
+            @Context ContainerRequestContext containerRequestContext) {
+        var email = getEmailFromContext(containerRequestContext);
+        return authenticationService.deleteAccount(email, deleteDto);
     }
 
     private String getEmailFromContext(ContainerRequestContext requestContext) {
