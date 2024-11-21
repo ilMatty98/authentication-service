@@ -127,7 +127,7 @@ jobs:
 
       # Step to run tests with Maven and generate a coverage report with Jacoco
       - name: Run tests with Maven and generate a coverage report with Jacoco
-        run: mvn clean verify jacoco:report
+        run: mvn clean verify jacoco:report -X
 
       # Step to perform code quality analysis with SonarQube
       - name: Perform code quality analysis with SonarQube
