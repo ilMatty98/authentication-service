@@ -12,7 +12,7 @@ public class UrlConstants {
 
     public static final String LOG_IN = "/logIn";
     public static final String SIGN_UP = "/signUp";
-    public static final String SEND_HINT = "/sendHint";
+    public static final String SEND_HINT = "/sendHint/{email}";
     public static final String CHECK_EMAIL = "/checkEmail/{email}";
     public static final String CHANGE_EMAIL = "/changeEmail";
     public static final String DELETE_ACCOUNT = "/deleteAccount";
