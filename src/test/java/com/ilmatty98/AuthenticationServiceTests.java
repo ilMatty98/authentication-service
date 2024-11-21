@@ -3,7 +3,9 @@ package com.ilmatty98;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
+import com.ilmatty98.dto.response.AccessDto;
 import com.ilmatty98.entity.User;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
@@ -178,5 +180,26 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         sb.append(chunk.repeat((int) chunkCount));
 
         return sb.toString();
+    }
+
+    protected AccessDto logIn(String email, String password) {
+        var logIn = fillObject(new LogInDto());
+        logIn.setEmail(email);
+        logIn.setIpAddress(IP_ADDRESS);
+        logIn.setMasterPasswordHash(password);
+
+        return given()
+                .contentType(ContentType.JSON)
+                .body(logIn)
+                .when()
+                .post(LOG_IN_URL)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .extract()
+                .as(AccessDto.class);
+    }
+
+    protected String getTokenFromLogIn(String email, String password) {
+        return logIn(email, password).getToken();
     }
 }

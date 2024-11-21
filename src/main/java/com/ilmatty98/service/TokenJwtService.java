@@ -59,9 +59,8 @@ public class TokenJwtService {
         }
     }
 
-    public String generateTokenJwt(String subject, Map<String, Object> claims) {
+    public String generateTokenJwt(Map<String, Object> claims) {
         var now = Instant.now();
-        claims.put(Claims.SUBJECT, subject);
         claims.put(Claims.ISSUED_AT, Date.from(now));
         claims.put(Claims.EXPIRATION, Date.from(now.plus(tokenExpiration, ChronoUnit.MINUTES)));
 
@@ -88,10 +87,10 @@ public class TokenJwtService {
                     .getPayload();
         } catch (ExpiredJwtException e) {
             log.warn("Token is expired");
-            throw new NotAuthorizedException("");
+            throw new NotAuthorizedException("Token is expired");
         } catch (Exception e) {
             log.warn("Invalid token");
-            throw new NotAuthorizedException("");
+            throw new NotAuthorizedException("Invalid token");
         }
     }
 

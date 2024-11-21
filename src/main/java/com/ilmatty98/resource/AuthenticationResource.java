@@ -1,14 +1,16 @@
 package com.ilmatty98.resource;
 
+import com.ilmatty98.constants.TokenClaimEnum;
+import com.ilmatty98.dto.request.ChangePasswordDto;
 import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.dto.response.AccessDto;
+import com.ilmatty98.interceptor.BearerAuthenticated;
 import com.ilmatty98.service.AuthenticationService;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.jboss.resteasy.reactive.RestPath;
@@ -43,6 +45,15 @@ public class AuthenticationResource {
     @Path(CONFIRM_EMAIL)
     public boolean confirmEmail(@RestPath String email, @RestPath String code) {
         return authenticationService.confirmEmail(email, code);
+    }
+
+    @PUT
+    @BearerAuthenticated
+    @Path(CHANGE_PASSWORD)
+    public boolean changePassword(
+            @Valid @RequestBody ChangePasswordDto changePasswordDto,
+            @Context ContainerRequestContext requestContext) {
+        return authenticationService.changePassword(changePasswordDto, requestContext.getProperty(TokenClaimEnum.EMAIL.getLabel()).toString());
     }
 
 }

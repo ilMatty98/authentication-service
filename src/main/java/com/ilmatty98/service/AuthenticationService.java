@@ -3,6 +3,7 @@ package com.ilmatty98.service;
 import com.ilmatty98.constants.EmailTypeEnum;
 import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.dto.request.ChangePasswordDto;
 import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.dto.response.AccessDto;
@@ -108,7 +109,7 @@ public class AuthenticationService {
         claims.put(TokenClaimEnum.EMAIL.getLabel(), user.getEmail());
         claims.put(TokenClaimEnum.ROLE.getLabel(), user.getState().name());
 
-        var token = tokenJwtService.generateTokenJwt(user.getEmail(), claims);
+        var token = tokenJwtService.generateTokenJwt(claims);
 
         var dynamicLabels = Map.ofEntries(
                 entry("date_value", logInDto.getLocalDateTime()),
@@ -139,6 +140,33 @@ public class AuthenticationService {
         user.setVerificationCode(null);
         userRepository.persist(user);
         log.info("End confirmEmail for user {}", email);
+        return true;
+    }
+
+    @Transactional
+    public boolean changePassword(ChangePasswordDto changePasswordDto, String email) {
+        log.info("Init changePassword for user {}", email);
+        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
+                .orElseThrow(() -> {
+                    log.warn("User {} not found", email);
+                    return new NotFoundException();
+                });
+
+        checkPassword(user, changePasswordDto.getCurrentMasterPasswordHash());
+
+        var salt = AuthenticationUtils.generateSalt(saltSize);
+        var hash = AuthenticationUtils.generateArgon2id(changePasswordDto.getNewMasterPasswordHash(), salt, argon2idSize,
+                argon2idIterations, argon2idMemoryKB, argon2idParallelism);
+
+        user.setTimestampPassword(getCurrentTimestamp());
+        user.setSalt(authenticationMapper.base64Encoding(salt));
+        user.setHash(authenticationMapper.base64Encoding(hash));
+        user.setInitializationVector(authenticationMapper.base64EncodingString(changePasswordDto.getNewInitializationVector()));
+        user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(changePasswordDto.getNewProtectedSymmetricKey()));
+
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_PSW, new HashMap<>());
+        userRepository.persist(user);
+        log.info("End changePassword for user {}", email);
         return true;
     }
 
