@@ -8,7 +8,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.mail.MessagingException;
 import jakarta.ws.rs.core.Response;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -16,7 +15,6 @@ import java.util.HashMap;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 @QuarkusTest
 class ChangePasswordTest extends AuthenticationServiceTests {
 
@@ -171,9 +169,8 @@ class ChangePasswordTest extends AuthenticationServiceTests {
 
     @Test
     void testChangePassword() throws MessagingException {
-        var emailToTest = "stranger@stranger.com";
-        signUp(emailToTest, PASSWORD);
-        final var user = confirmEmail(emailToTest);
+        signUp(EMAIL, PASSWORD);
+        final var user = confirmEmail(EMAIL);
 
         var changePasswordDto = new ChangePasswordDto();
         changePasswordDto.setCurrentMasterPasswordHash(PASSWORD);
@@ -184,7 +181,7 @@ class ChangePasswordTest extends AuthenticationServiceTests {
         given()
                 .contentType(ContentType.JSON)
                 .body(changePasswordDto)
-                .header(AUTH_HEADER_NAME, AUTH_HEADER_PREFIX + getTokenFromLogIn(emailToTest, PASSWORD))
+                .header(AUTH_HEADER_NAME, AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD))
                 .when()
                 .put(CHANGE_PASSWORD_URL)
                 .then()
@@ -222,6 +219,6 @@ class ChangePasswordTest extends AuthenticationServiceTests {
         assertEquals(user.getEmail(), email.getAllRecipients()[0].toString());
         assertEquals("Password changed!", email.getSubject());
 
-        assertNotNull(getTokenFromLogIn(emailToTest, "new password"));
+        assertNotNull(getTokenFromLogIn(EMAIL, "new password"));
     }
 }
