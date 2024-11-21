@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class DeleteDto {
 
-    @NotBlank(message = "CurrentMasterPasswordHash cannot be blank")
+    @NotBlank(message = "MasterPasswordHash cannot be blank")
     private String masterPasswordHash;
 }
