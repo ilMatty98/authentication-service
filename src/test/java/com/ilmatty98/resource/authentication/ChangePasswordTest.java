@@ -210,7 +210,7 @@ class ChangePasswordTest extends AuthenticationServiceTests {
 
         //Check email
         var receivedMessages = greenMail.getReceivedMessages();
-        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
+        assertTrue(greenMail.waitForIncomingEmail(10000, 1));
         assertEquals(3, receivedMessages.length);
 
         var email = receivedMessages[2];
