@@ -16,7 +16,6 @@ import java.util.HashMap;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 @QuarkusTest
 class ChangePasswordTest extends AuthenticationServiceTests {
 
@@ -171,7 +170,6 @@ class ChangePasswordTest extends AuthenticationServiceTests {
 
     @Test
     void testChangePassword() throws MessagingException {
-        log.info("testChangePassword - testChangePassword - testChangePassword -testChangePassword");
         signUp(EMAIL, PASSWORD);
         final var user = confirmEmail(EMAIL);
 
