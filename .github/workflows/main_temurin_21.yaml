@@ -21,7 +21,7 @@ jobs:
       - name: Set up Temurin 21
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: '21.0.5'
           distribution: 'temurin'
 
       # Step to Commit, Tag and Push the new version of pom.xml
