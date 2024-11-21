@@ -8,6 +8,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.mail.MessagingException;
 import jakarta.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @QuarkusTest
 class ChangePasswordTest extends AuthenticationServiceTests {
 
@@ -169,6 +171,7 @@ class ChangePasswordTest extends AuthenticationServiceTests {
 
     @Test
     void testChangePassword() throws MessagingException {
+        log.info("Init test testChangePassword");
         signUp(EMAIL, PASSWORD);
         final var user = confirmEmail(EMAIL);
 
@@ -210,7 +213,7 @@ class ChangePasswordTest extends AuthenticationServiceTests {
 
         //Check email
         var receivedMessages = greenMail.getReceivedMessages();
-        assertTrue(greenMail.waitForIncomingEmail(10000, 1));
+        assertTrue(greenMail.waitForIncomingEmail(5000, 1));
         assertEquals(3, receivedMessages.length);
 
         var email = receivedMessages[2];
