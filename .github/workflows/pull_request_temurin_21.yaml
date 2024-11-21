@@ -29,7 +29,7 @@ jobs:
       - name: Set up Temurin 21
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: '21.0.5'
           distribution: 'temurin'
 
       # Step to determine which part of the version to update based on the starting branch
@@ -127,7 +127,7 @@ jobs:
 
       # Step to run tests with Maven and generate a coverage report with Jacoco
       - name: Run tests with Maven and generate a coverage report with Jacoco
-        run: mvn clean verify jacoco:report
+        run: mvn clean verify jacoco:report -X
 
       # Step to perform code quality analysis with SonarQube
       - name: Perform code quality analysis with SonarQube
