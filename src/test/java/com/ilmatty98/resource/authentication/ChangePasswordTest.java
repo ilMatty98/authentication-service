@@ -107,7 +107,6 @@ class ChangePasswordTest extends AuthenticationServiceTests {
         changePasswordDto.setNewInitializationVector("new initializationVector");
 
         var claims = new HashMap<String, Object>();
-        claims.put(TokenClaimEnum.EMAIL.getLabel(), user.getEmail());
         claims.put(TokenClaimEnum.ROLE.getLabel(), user.getState());
         var token = tokenJwtService.generateTokenJwt(claims);
 

@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.jboss.resteasy.reactive.RestPath;
 
+import java.util.Optional;
+
 import static com.ilmatty98.constants.UrlConstants.*;
 
 @RequiredArgsConstructor
@@ -52,8 +54,21 @@ public class AuthenticationResource {
     @Path(CHANGE_PASSWORD)
     public boolean changePassword(
             @Valid @RequestBody ChangePasswordDto changePasswordDto,
-            @Context ContainerRequestContext requestContext) {
-        return authenticationService.changePassword(changePasswordDto, requestContext.getProperty(TokenClaimEnum.EMAIL.getLabel()).toString());
+            @Context ContainerRequestContext containerRequestContext) {
+        var email = getEmailFromContext(containerRequestContext);
+        return authenticationService.changePassword(changePasswordDto, email);
+    }
+
+    @POST
+    @Path(SEND_HINT)
+    public boolean sendHint(@RestPath String email) {
+        return authenticationService.sendHint(email);
+    }
+
+    private String getEmailFromContext(ContainerRequestContext requestContext) {
+        return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.EMAIL.getLabel()))
+                .map(Object::toString)
+                .orElseThrow(() -> new NotAuthorizedException("Missing email in request context"));
     }
 
 }

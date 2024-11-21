@@ -33,7 +33,7 @@ public class BearerTokenInterceptor {
 
         // Verify the token
         var claims = tokenJwtService.validateTokenJwt(token);
-        var email = claims.get(TokenClaimEnum.EMAIL.getLabel()).toString();
+        var email = claims.getOrDefault(TokenClaimEnum.EMAIL.getLabel(), null);
 
         // Sets the email extracted from the token in the header
         containerRequestContext.setProperty(TokenClaimEnum.EMAIL.getLabel(), email);

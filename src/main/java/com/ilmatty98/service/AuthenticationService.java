@@ -170,6 +170,20 @@ public class AuthenticationService {
         return true;
     }
 
+    public boolean sendHint(String email) {
+        log.info("Init sendHint for user {}", email);
+        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
+                .orElseThrow(() -> {
+                    log.warn("User {} not found", email);
+                    return new NotFoundException();
+                });
+
+        var dynamicLabels = Map.ofEntries(entry("hint_value", user.getHint()));
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels);
+        log.info("End sendHint for user {}", email);
+        return true;
+    }
+
     private static Timestamp getCurrentTimestamp() {
         return Timestamp.from(Instant.now());
     }
@@ -185,6 +199,4 @@ public class AuthenticationService {
             throw new NotAuthorizedException("");
         }
     }
-
-
 }
