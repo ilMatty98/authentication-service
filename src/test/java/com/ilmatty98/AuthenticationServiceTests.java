@@ -27,13 +27,12 @@ import org.junit.jupiter.api.TestInstance;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import java.util.Random;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -209,14 +208,6 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 
-    protected static LocalDateTime getLocalDataTime(Timestamp timestamp) {
-        return Optional.ofNullable(timestamp)
-                .map(Timestamp::toLocalDateTime)
-                .map(l -> l.withNano(0))
-                .map(l -> l.truncatedTo(ChronoUnit.SECONDS))
-                .orElse(null);
-    }
-
     protected static String createLargeString(double mb) {
         var desiredSizeInBytes = mb * 1024 * 1024; // 3 MB
         var chunkSize = 1024; // Chunk size for each iteration
@@ -251,5 +242,10 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
 
     protected String getTokenFromLogIn(String email, String password) {
         return logIn(email, password).getToken();
+    }
+
+    protected void testBetweenTimestamp(Timestamp one, Timestamp two) {
+        var condition = Duration.between(one.toLocalDateTime(), two.toLocalDateTime()).abs().toMinutes() <= 1;
+        assertTrue(condition, "The timestamps are not within 1 minute of each other");
     }
 }

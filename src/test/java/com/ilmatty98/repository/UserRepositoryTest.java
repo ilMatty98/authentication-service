@@ -88,9 +88,9 @@ class UserRepositoryTest extends AuthenticationServiceTests {
                     assertEquals(expectedUser.getHash(), u.getHash());
                     assertEquals(expectedUser.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
                     assertEquals(expectedUser.getInitializationVector(), u.getInitializationVector());
-                    assertEquals(getLocalDataTime(expectedUser.getTimestampCreation()), getLocalDataTime(u.getTimestampCreation()));
-                    assertEquals(getLocalDataTime(expectedUser.getTimestampLastAccess()), getLocalDataTime(u.getTimestampLastAccess()));
-                    assertEquals(getLocalDataTime(expectedUser.getTimestampPassword()), getLocalDataTime(u.getTimestampPassword()));
+                    testBetweenTimestamp(expectedUser.getTimestampCreation(), u.getTimestampCreation());
+                    testBetweenTimestamp(expectedUser.getTimestampLastAccess(), u.getTimestampLastAccess());
+                    testBetweenTimestamp(expectedUser.getTimestampPassword(), u.getTimestampPassword());
                     assertEquals(expectedUser.getLanguage(), u.getLanguage());
                     assertEquals(expectedUser.getHint(), u.getHint());
                     assertEquals(expectedUser.getPropic(), u.getPropic());

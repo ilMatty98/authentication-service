@@ -399,9 +399,9 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
         assertEquals(user.getHash(), u.getHash());
         assertEquals(user.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
         assertEquals(user.getInitializationVector(), u.getInitializationVector());
-        assertEquals(getLocalDataTime(user.getTimestampCreation()), getLocalDataTime(u.getTimestampCreation()));
+        testBetweenTimestamp(user.getTimestampCreation(), u.getTimestampCreation());
         assertTrue(user.getTimestampLastAccess().before(u.getTimestampLastAccess()));
-        assertEquals(getLocalDataTime(user.getTimestampPassword()), getLocalDataTime(u.getTimestampPassword()));
+        testBetweenTimestamp(user.getTimestampPassword(), u.getTimestampPassword());
         assertTrue(u.getTimestampEmail().before(Timestamp.from(Instant.now())));
         assertEquals(user.getLanguage(), u.getLanguage());
         assertEquals(user.getHint(), u.getHint());

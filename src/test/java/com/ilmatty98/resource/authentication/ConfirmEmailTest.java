@@ -69,10 +69,10 @@ class ConfirmEmailTest extends AuthenticationServiceTests {
         assertEquals(user.getHash(), u.getHash());
         assertEquals(user.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
         assertEquals(user.getInitializationVector(), u.getInitializationVector());
-        assertEquals(getLocalDataTime(user.getTimestampCreation()), getLocalDataTime(u.getTimestampCreation()));
-        assertEquals(getLocalDataTime(user.getTimestampLastAccess()), getLocalDataTime(u.getTimestampLastAccess()));
-        assertEquals(getLocalDataTime(user.getTimestampPassword()), getLocalDataTime(u.getTimestampPassword()));
-        assertEquals(getLocalDataTime(user.getTimestampEmail()), getLocalDataTime(u.getTimestampEmail()));
+        testBetweenTimestamp(user.getTimestampCreation(), u.getTimestampCreation());
+        testBetweenTimestamp(user.getTimestampLastAccess(), u.getTimestampLastAccess());
+        testBetweenTimestamp(user.getTimestampPassword(), u.getTimestampPassword());
+        testBetweenTimestamp(user.getTimestampEmail(), u.getTimestampEmail());
         assertEquals(user.getLanguage(), u.getLanguage());
         assertEquals(user.getHint(), u.getHint());
         assertEquals(user.getPropic(), u.getPropic());
