@@ -80,6 +80,16 @@ public class AuthenticationResource {
         return authenticationService.changeEmail(changeEmailDto, email);
     }
 
+    @PUT
+    @BearerAuthenticated
+    @Path(CONFIRM_CHANGE_EMAIL)
+    public boolean confirmChangeEmail(@Valid @RequestBody ConfirmChangeEmailDto confirmChangeEmailDto,
+                                      @Context ContainerRequestContext containerRequestContext) {
+        var email = getEmailFromContext(containerRequestContext);
+        return authenticationService.confirmChangeEmail(confirmChangeEmailDto, email);
+    }
+
+
     private String getEmailFromContext(ContainerRequestContext requestContext) {
         return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.EMAIL.getLabel()))
                 .map(Object::toString)

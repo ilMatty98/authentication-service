@@ -3,6 +3,7 @@ package com.ilmatty98;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.dto.request.ChangeEmailDto;
 import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.dto.response.AccessDto;
@@ -154,6 +155,24 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         given()
                 .contentType(ContentType.JSON)
                 .patch(CONFIRM_EMAIL_URL, email, user.getVerificationCode())
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+
+        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+    }
+
+    protected User changeEmail(String email, String password, String newEmail) {
+        var changeEmailDto = new ChangeEmailDto();
+        changeEmailDto.setEmail(email);
+        changeEmailDto.setEmail(newEmail);
+        changeEmailDto.setMasterPasswordHash(password);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(changeEmailDto)
+                .when()
+                .header(AUTH_HEADER_NAME, AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD))
+                .put(CHANGE_EMAIL_URL)
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 

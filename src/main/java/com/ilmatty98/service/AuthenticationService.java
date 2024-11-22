@@ -21,6 +21,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -206,7 +207,7 @@ public class AuthenticationService {
     public boolean changeEmail(ChangeEmailDto changeEmailDto, String oldEmail) {
         log.info("Init changeEmail for user {} to {}", oldEmail, changeEmailDto.getEmail());
         if (oldEmail.equals(changeEmailDto.getEmail()) || userRepository.existsByEmail(changeEmailDto.getEmail())) {
-            log.warn("Email already registered");
+            log.warn("Email {} already registered", changeEmailDto.getEmail());
             throw new BadRequestException();
         }
 
@@ -230,6 +231,76 @@ public class AuthenticationService {
         emailService.sendEmail(changeEmailDto.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_CODE, dynamicLabels);
         userRepository.persist(user);
         log.info("End changeEmail for user {} to {}", oldEmail, changeEmailDto.getEmail());
+        return true;
+    }
+
+    @Transactional(dontRollbackOn = BadRequestException.class)
+    public boolean confirmChangeEmail(ConfirmChangeEmailDto confirmChangeEmailDto, String oldEmail) {
+        log.info("Init confirmChangeEmail for user {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
+        if (userRepository.existsByEmail(confirmChangeEmailDto.getEmail())) {
+            log.warn("Email {} already registered", confirmChangeEmailDto.getEmail());
+            throw new BadRequestException();
+        }
+
+        var user = userRepository.findByEmailAndNewEmailAndState(oldEmail, confirmChangeEmailDto.getEmail(), UserStateEnum.VERIFIED)
+                .orElseThrow(() -> {
+                    log.warn("User {} not found", oldEmail);
+                    return new NotFoundException();
+                });
+
+        checkPassword(user, confirmChangeEmailDto.getMasterPasswordHash());
+
+        var currentTime = LocalDateTime.now();
+        var maximumTime = user.getTimestampEmail().toLocalDateTime().plusMinutes(emailChangeExpirationMn);
+
+        // Time out
+        if (currentTime.isAfter(maximumTime)) {
+            user.setVerificationCode(null);
+            user.setNewEmail(null);
+            user.setAttempt(null);
+            userRepository.persist(user);
+
+            log.warn("The maximum time limit has been exceeded for user {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
+            throw new BadRequestException();
+        }
+
+        // The attempt limit has been reached
+        if (user.getAttempt() >= emailChangeAttempts) {
+            user.setVerificationCode(null);
+            user.setNewEmail(null);
+            user.setAttempt(null);
+            userRepository.persist(user);
+
+            log.warn("The attempt limit has been reached for user {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
+            throw new BadRequestException();
+        }
+
+        // Incorrect verification code
+        if (!confirmChangeEmailDto.getVerificationCode().equals(user.getVerificationCode())) { //Incorrect verification code
+            user.setAttempt(user.getAttempt() + 1);
+            userRepository.persist(user);
+            log.warn("Incorrect verification code for user {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
+            throw new BadRequestException();
+        }
+
+        //Ok
+        var salt = AuthenticationUtils.generateSalt(saltSize);
+        var hash = AuthenticationUtils.generateArgon2id(confirmChangeEmailDto.getNewMasterPasswordHash(), salt,
+                argon2idSize, argon2idIterations, argon2idMemoryKB, argon2idParallelism);
+
+        user.setEmail(user.getNewEmail());
+        user.setSalt(authenticationMapper.base64Encoding(salt));
+        user.setHash(authenticationMapper.base64Encoding(hash));
+        user.setInitializationVector(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewInitializationVector()));
+        user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewProtectedSymmetricKey()));
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL, new HashMap<>());
+
+        user.setVerificationCode(null);
+        user.setNewEmail(null);
+        user.setAttempt(null);
+        userRepository.persist(user);
+
+        log.info("End confirmChangeEmail for user {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
         return true;
     }
 
