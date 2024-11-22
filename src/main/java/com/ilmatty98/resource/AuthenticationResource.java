@@ -1,10 +1,7 @@
 package com.ilmatty98.resource;
 
 import com.ilmatty98.constants.TokenClaimEnum;
-import com.ilmatty98.dto.request.ChangePasswordDto;
-import com.ilmatty98.dto.request.DeleteDto;
-import com.ilmatty98.dto.request.LogInDto;
-import com.ilmatty98.dto.request.SignUpDto;
+import com.ilmatty98.dto.request.*;
 import com.ilmatty98.dto.response.AccessDto;
 import com.ilmatty98.interceptor.BearerAuthenticated;
 import com.ilmatty98.service.AuthenticationService;
@@ -53,9 +50,8 @@ public class AuthenticationResource {
     @PUT
     @BearerAuthenticated
     @Path(CHANGE_PASSWORD)
-    public boolean changePassword(
-            @Valid @RequestBody ChangePasswordDto changePasswordDto,
-            @Context ContainerRequestContext containerRequestContext) {
+    public boolean changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto,
+                                  @Context ContainerRequestContext containerRequestContext) {
         var email = getEmailFromContext(containerRequestContext);
         return authenticationService.changePassword(changePasswordDto, email);
     }
@@ -69,11 +65,19 @@ public class AuthenticationResource {
     @DELETE
     @BearerAuthenticated
     @Path(DELETE_ACCOUNT)
-    public boolean deleteAccount(
-            @Valid @RequestBody DeleteDto deleteDto,
-            @Context ContainerRequestContext containerRequestContext) {
+    public boolean deleteAccount(@Valid @RequestBody DeleteDto deleteDto,
+                                 @Context ContainerRequestContext containerRequestContext) {
         var email = getEmailFromContext(containerRequestContext);
         return authenticationService.deleteAccount(email, deleteDto);
+    }
+
+    @PUT
+    @BearerAuthenticated
+    @Path(CHANGE_EMAIL)
+    public boolean changeEmail(@Valid @RequestBody ChangeEmailDto changeEmailDto,
+                               @Context ContainerRequestContext containerRequestContext) {
+        var email = getEmailFromContext(containerRequestContext);
+        return authenticationService.changeEmail(changeEmailDto, email);
     }
 
     private String getEmailFromContext(ContainerRequestContext requestContext) {

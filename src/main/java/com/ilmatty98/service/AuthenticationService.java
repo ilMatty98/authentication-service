@@ -3,10 +3,7 @@ package com.ilmatty98.service;
 import com.ilmatty98.constants.EmailTypeEnum;
 import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.constants.UserStateEnum;
-import com.ilmatty98.dto.request.ChangePasswordDto;
-import com.ilmatty98.dto.request.DeleteDto;
-import com.ilmatty98.dto.request.LogInDto;
-import com.ilmatty98.dto.request.SignUpDto;
+import com.ilmatty98.dto.request.*;
 import com.ilmatty98.dto.response.AccessDto;
 import com.ilmatty98.entity.User;
 import com.ilmatty98.mapper.AuthenticationMapper;
@@ -21,9 +18,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Map.entry;
 
@@ -202,6 +202,37 @@ public class AuthenticationService {
         return true;
     }
 
+    @Transactional
+    public boolean changeEmail(ChangeEmailDto changeEmailDto, String oldEmail) {
+        log.info("Init changeEmail for user {} to {}", oldEmail, changeEmailDto.getEmail());
+        if (oldEmail.equals(changeEmailDto.getEmail()) || userRepository.existsByEmail(changeEmailDto.getEmail())) {
+            log.warn("Email already registered");
+            throw new BadRequestException();
+        }
+
+        var user = userRepository.findByEmailAndState(oldEmail, UserStateEnum.VERIFIED)
+                .orElseThrow(() -> {
+                    log.warn("User {} not found", oldEmail);
+                    return new NotFoundException();
+                });
+
+        checkPassword(user, changeEmailDto.getMasterPasswordHash());
+
+        user.setTimestampEmail(getCurrentTimestamp());
+        user.setVerificationCode(generateVerificationCode());
+        user.setNewEmail(changeEmailDto.getEmail());
+        user.setAttempt(0);
+
+        var dynamicLabels = Map.ofEntries(entry("email", changeEmailDto.getEmail()));
+        emailService.sendEmail(oldEmail, user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_NOTIFICATION, dynamicLabels);
+
+        dynamicLabels = Map.ofEntries(entry("code", user.getVerificationCode()));
+        emailService.sendEmail(changeEmailDto.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_CODE, dynamicLabels);
+        userRepository.persist(user);
+        log.info("End changeEmail for user {} to {}", oldEmail, changeEmailDto.getEmail());
+        return true;
+    }
+
     private static Timestamp getCurrentTimestamp() {
         return Timestamp.from(Instant.now());
     }
@@ -217,4 +248,12 @@ public class AuthenticationService {
             throw new NotAuthorizedException("");
         }
     }
+
+    private static String generateVerificationCode() {
+        var secureRandom = new SecureRandom();
+        return IntStream.range(0, 6)
+                .mapToObj(i -> String.valueOf(secureRandom.nextInt(10)))
+                .collect(Collectors.joining());
+    }
+
 }
