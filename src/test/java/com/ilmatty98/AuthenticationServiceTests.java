@@ -212,6 +212,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     protected static LocalDateTime getLocalDataTime(Timestamp timestamp) {
         return Optional.ofNullable(timestamp)
                 .map(Timestamp::toLocalDateTime)
+                .map(l -> l.withNano(0))
                 .map(l -> l.truncatedTo(ChronoUnit.SECONDS))
                 .orElse(null);
     }
