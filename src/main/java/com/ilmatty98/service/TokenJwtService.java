@@ -86,10 +86,10 @@ public class TokenJwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (ExpiredJwtException e) {
-            log.warn("Token is expired");
+            log.warn("Token is expired", e);
             throw new NotAuthorizedException("Token is expired");
         } catch (Exception e) {
-            log.warn("Invalid token");
+            log.warn("Invalid token", e);
             throw new NotAuthorizedException("Invalid token");
         }
     }
