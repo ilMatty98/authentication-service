@@ -1,5 +1,12 @@
 name: Pull Request Workflow
 
+on:
+  push:
+    branches:
+      - 'develop/**'
+      - 'feature/**'
+      - 'fix/**'
+
 jobs:
   use-shared-workflow:
     uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_pull_request.yaml@master
