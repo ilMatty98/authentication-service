@@ -1,9 +1,9 @@
 name: Main Branch Workflow
 
 on:
-  push:
+  push: # Trigger the workflow on push events
     branches:
-      - 'main'
+      - main  # Run the workflow only when there's a push to the 'main' branch
 
 jobs:
   use-shared-workflow:

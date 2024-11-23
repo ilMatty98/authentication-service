@@ -1,11 +1,12 @@
 name: Pull Request Workflow
 
 on:
-  push:
+  pull_request: # Trigger the workflow on pull requests
     branches:
-      - 'develop/**'
-      - 'feature/**'
-      - 'fix/**'
+      - main  # Run the workflow only if the pull request is targeted to the 'main' branch
+    types:
+      - opened  # Run the workflow when a pull request is opened
+      - synchronize  # Run the workflow when a pull request is updated
 
 jobs:
   use-shared-workflow:
