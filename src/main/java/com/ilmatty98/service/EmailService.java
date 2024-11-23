@@ -55,6 +55,7 @@ public class EmailService {
         try {
             return map.getOrDefault(language, map.getOrDefault(DEFAULT_LANGUAGE, ""));
         } catch (Exception e) {
+            log.warn("Error during getValue", e);
             return "";
         }
     }
@@ -68,6 +69,7 @@ public class EmailService {
             }
             return Optional.ofNullable(template).orElse("");
         } catch (Exception e) {
+            log.warn("Error during fillTemplate", e);
             return template;
         }
     }
@@ -81,6 +83,7 @@ public class EmailService {
             }
             return substrings;
         } catch (Exception e) {
+            log.warn("Error during extractSubstrings", e);
             return Collections.emptyList();
         }
     }

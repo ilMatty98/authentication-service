@@ -1,0 +1,17 @@
+name: Pull Request Workflow
+
+on:
+  pull_request: # Trigger the workflow on pull requests
+    branches:
+      - main  # Run the workflow only if the pull request is targeted to the 'main' branch
+    types:
+      - opened  # Run the workflow when a pull request is opened
+      - synchronize  # Run the workflow when a pull request is updated
+
+permissions:
+  contents: write # Allows to write to the repository
+
+jobs:
+  use-shared-workflow:
+    uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_pull_request.yaml@master
+    secrets: inherit  # To inherit secrets from the repository

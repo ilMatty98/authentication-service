@@ -3,7 +3,10 @@ package com.ilmatty98;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.dto.request.ChangeEmailDto;
+import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
+import com.ilmatty98.dto.response.AccessDto;
 import com.ilmatty98.entity.User;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
@@ -24,13 +27,12 @@ import org.junit.jupiter.api.TestInstance;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import java.util.Random;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -158,11 +160,52 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         return userRepository.findByEmail(email).orElseGet(Assertions::fail);
     }
 
-    protected static LocalDateTime getLocalDataTime(Timestamp timestamp) {
-        return Optional.ofNullable(timestamp)
-                .map(Timestamp::toLocalDateTime)
-                .map(l -> l.truncatedTo(ChronoUnit.SECONDS))
-                .orElse(null);
+    protected User changeEmail(String email, String password, String newEmail) {
+        var changeEmailDto = new ChangeEmailDto();
+        changeEmailDto.setEmail(email);
+        changeEmailDto.setEmail(newEmail);
+        changeEmailDto.setMasterPasswordHash(password);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(changeEmailDto)
+                .when()
+                .header(AUTH_HEADER_NAME, AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD))
+                .put(CHANGE_EMAIL_URL)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+
+        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+    }
+
+    protected User getUserById(Long id) {
+        return given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/user/{id}", id)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .extract()
+                .as(User.class);
+    }
+
+    protected void saveUser(User user) {
+        given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .when()
+                .post("/user")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+    }
+
+    protected void deleteUserById(Long id) {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/user/{id}", id)
+                .then()
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 
     protected static String createLargeString(double mb) {
@@ -178,5 +221,31 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         sb.append(chunk.repeat((int) chunkCount));
 
         return sb.toString();
+    }
+
+    protected AccessDto logIn(String email, String password) {
+        var logIn = fillObject(new LogInDto());
+        logIn.setEmail(email);
+        logIn.setIpAddress(IP_ADDRESS);
+        logIn.setMasterPasswordHash(password);
+
+        return given()
+                .contentType(ContentType.JSON)
+                .body(logIn)
+                .when()
+                .post(LOG_IN_URL)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .extract()
+                .as(AccessDto.class);
+    }
+
+    protected String getTokenFromLogIn(String email, String password) {
+        return logIn(email, password).getToken();
+    }
+
+    protected void testBetweenTimestamp(Timestamp one, Timestamp two) {
+        var condition = Duration.between(one.toLocalDateTime(), two.toLocalDateTime()).abs().toMinutes() <= 1;
+        assertTrue(condition, "The timestamps are not within 1 minute of each other");
     }
 }

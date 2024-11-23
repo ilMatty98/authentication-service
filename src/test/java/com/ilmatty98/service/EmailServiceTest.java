@@ -6,8 +6,6 @@ import com.ilmatty98.constants.EmailTypeEnum;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -63,7 +61,6 @@ class EmailServiceTest extends AuthenticationServiceTests {
     }
 
     @Test
-    @DisabledOnOs(OS.LINUX)
     void testChangePsw() throws MessagingException {
         var expectedSubject = "Password changed!";
         var label = List.of("Password changed!", "Password has been changed!", "Credentials Manager");
