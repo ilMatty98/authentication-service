@@ -10,5 +10,5 @@ permissions:
 
 jobs:
   use-shared-workflow:
-    uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_main.yaml@master
+    uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_GKE_main.yaml@master
     secrets: inherit  # To inherit secrets from the repository
