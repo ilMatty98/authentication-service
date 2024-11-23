@@ -2,4 +2,4 @@ name: Main Branch Workflow
 
 jobs:
   use-shared-workflow:
-    uses: ilMatty98/workflow/.github/workflows/quarkus_maven_java/main_temurin_21.yaml@main
+    uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_main.yaml@master
