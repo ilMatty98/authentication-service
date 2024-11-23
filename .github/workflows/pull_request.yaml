@@ -1,0 +1,5 @@
+name: Pull Request Workflow
+
+jobs:
+  use-shared-workflow:
+    uses: ilMatty98/workflow/.github/workflows/quarkus_maven_java/pull_request_temurin_21.yaml@main
