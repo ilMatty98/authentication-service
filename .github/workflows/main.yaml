@@ -1,5 +1,10 @@
 name: Main Branch Workflow
 
+on:
+  push:
+    branches:
+      - "*"
+
 jobs:
   use-shared-workflow:
     uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_main.yaml@master
