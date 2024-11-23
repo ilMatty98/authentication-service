@@ -8,6 +8,10 @@ on:
       - opened  # Run the workflow when a pull request is opened
       - synchronize  # Run the workflow when a pull request is updated
 
+permissions:
+  contents: write # Allows to write to the repository
+
 jobs:
   use-shared-workflow:
     uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_pull_request.yaml@master
+    secrets: inherit  # To inherit secrets from the repository
