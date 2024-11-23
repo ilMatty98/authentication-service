@@ -1,0 +1,14 @@
+name: Main Branch Workflow
+
+on:
+  push: # Trigger the workflow on push events
+    branches:
+      - main  # Run the workflow only when there's a push to the 'main' branch
+
+permissions:
+  contents: write # Allows to write to the repository
+
+jobs:
+  use-shared-workflow:
+    uses: ilMatty98/workflow/.github/workflows/quarkus_maven_temurin21_main.yaml@master
+    secrets: inherit  # To inherit secrets from the repository

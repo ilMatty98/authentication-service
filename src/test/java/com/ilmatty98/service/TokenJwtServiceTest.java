@@ -25,7 +25,7 @@ class TokenJwtServiceTest extends AuthenticationServiceTests {
         claims.put("claim1", generateRandomString(10));
         claims.put("claim2", generateRandomString(100));
 
-        var token = tokenJwtService.generateTokenJwt(subject, claims);
+        var token = tokenJwtService.generateTokenJwt(claims);
         assertNotNull(token);
 
         var claimsFromToken = tokenJwtService.validateTokenJwt(token);
