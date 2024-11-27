@@ -157,7 +157,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+        return getUserById(user.getId());
     }
 
     protected User changeEmail(String email, String password, String newEmail) {
