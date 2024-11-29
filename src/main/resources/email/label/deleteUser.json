@@ -6,7 +6,7 @@
   "template": {
     "title": {
       "IT": "Il tuo account è stato cancellato",
-      "EN": "Your account has been cancelled"
+      "EN": "Your account has been deleted"
     },
     "body": {
       "IT": "Eliminato con successo il tuo account Credentials Manager!",
