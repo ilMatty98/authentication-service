@@ -9,8 +9,8 @@
       "EN": "Your Email Change!"
     },
     "body": {
-      "IT": "Per finalizzare la modifica del tuo indirizzo email Bitwarden, inserisci il seguente codice nel web vault",
-      "EN": "To finalize changing your Bitwarden email address enter the following code in web vault"
+      "IT": "Per finalizzare la modifica del tuo indirizzo email, inserisci il seguente codice",
+      "EN": "To finalize changing your email address, enter the following code"
     },
     "footer": {
       "EN": "Credentials Manager"
