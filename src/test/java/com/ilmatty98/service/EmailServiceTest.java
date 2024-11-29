@@ -79,7 +79,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
     @Test
     void testChangeEmailCode() throws MessagingException {
         var expectedSubject = "Your Email Change!";
-        var label = List.of("Your Email Change!", "To finalize changing your Bitwarden email address enter the following code in web vault", "Credentials Manager");
+        var label = List.of("Your Email Change!", "To finalize changing your email address, enter the following code", "Credentials Manager");
         var dynamicLabels = new HashMap<String, String>();
         dynamicLabels.put("code", "123456");
 
