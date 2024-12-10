@@ -79,7 +79,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
     @Test
     void testChangeEmailCode() throws MessagingException {
         var expectedSubject = "Your Email Change!";
-        var label = List.of("Your Email Change!", "To finalize changing your Bitwarden email address enter the following code in web vault", "Credentials Manager");
+        var label = List.of("Your Email Change!", "To finalize changing your email address, enter the following code", "Credentials Manager");
         var dynamicLabels = new HashMap<String, String>();
         dynamicLabels.put("code", "123456");
 
@@ -104,6 +104,14 @@ class EmailServiceTest extends AuthenticationServiceTests {
         dynamicLabels.put("hint_value", generateRandomString(20) + 1);
 
         verifyEmail(EmailTypeEnum.SEND_HINT, expectedSubject, label, dynamicLabels);
+    }
+
+    @Test
+    void testDeleteUser() throws MessagingException {
+        var expectedSubject = "Successfully deleted your Credential Manager account!";
+        var label = List.of("Your account has been deleted", "Successfully deleted your Credential Manager account!", "Credentials Manager");
+
+        verifyEmail(EmailTypeEnum.DELETE_USER, expectedSubject, label, new HashMap<>());
     }
 
     private void verifyLanguage(String language, String expectedSubject, String expectedContainsBody) throws MessagingException {
