@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -90,11 +91,7 @@ public class AuthenticationService {
     @Transactional
     public AccessDto logIn(LogInDto logInDto) {
         log.info("Init logIn for user {}", logInDto.getEmail());
-        var user = userRepository.findByEmail(logInDto.getEmail())
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", logInDto.getEmail());
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmail(logInDto.getEmail()), logInDto.getEmail());
 
         if (UserStateEnum.UNVERIFIED.equals(user.getState())) {
             log.warn("User {} not confirmed", logInDto.getEmail());
@@ -132,11 +129,7 @@ public class AuthenticationService {
     @Transactional
     public boolean confirmEmail(String email, String code) {
         log.info("Init confirmEmail for user {}", email);
-        var user = userRepository.findByEmailAndVerificationCode(email, code)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndVerificationCode(email, code), email);
 
         user.setState(UserStateEnum.VERIFIED);
         user.setVerificationCode(null);
@@ -148,11 +141,7 @@ public class AuthenticationService {
     @Transactional
     public boolean changePassword(ChangePasswordDto changePasswordDto, String email) {
         log.info("Init changePassword for user {}", email);
-        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
 
         checkPassword(user, changePasswordDto.getCurrentMasterPasswordHash());
 
@@ -174,11 +163,7 @@ public class AuthenticationService {
 
     public boolean sendHint(String email) {
         log.info("Init sendHint for user {}", email);
-        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
 
         var dynamicLabels = Map.ofEntries(entry("hint_value", user.getHint()));
         emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels);
@@ -189,11 +174,7 @@ public class AuthenticationService {
     @Transactional
     public boolean deleteAccount(String email, DeleteDto deleteDto) {
         log.info("Init deleteAccount for user {}", email);
-        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
 
         checkPassword(user, deleteDto.getMasterPasswordHash());
 
@@ -211,11 +192,7 @@ public class AuthenticationService {
             throw new BadRequestException();
         }
 
-        var user = userRepository.findByEmailAndState(oldEmail, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", oldEmail);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(oldEmail, UserStateEnum.VERIFIED), oldEmail);
 
         checkPassword(user, changeEmailDto.getMasterPasswordHash());
 
@@ -242,11 +219,7 @@ public class AuthenticationService {
             throw new BadRequestException();
         }
 
-        var user = userRepository.findByEmailAndNewEmailAndState(oldEmail, confirmChangeEmailDto.getEmail(), UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", oldEmail);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndNewEmailAndState(oldEmail, confirmChangeEmailDto.getEmail(), UserStateEnum.VERIFIED), oldEmail);
 
         checkPassword(user, confirmChangeEmailDto.getMasterPasswordHash());
 
@@ -290,6 +263,27 @@ public class AuthenticationService {
 
         log.info("End confirmChangeEmail for user {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
         return true;
+    }
+
+    @Transactional
+    public boolean changeInformation(ChangeInformationDto changeInformationDto, String email) {
+        log.info("Init changeInformation for user {}", email);
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
+
+        user.setHint(changeInformationDto.getHint());
+        user.setLanguage(changeInformationDto.getLanguage());
+        user.setPropic(changeInformationDto.getPropic());
+        userRepository.persist(user);
+
+        log.info("End changeInformation for user {}", email);
+        return true;
+    }
+
+    private User getUser(Supplier<Optional<User>> userSupplier, String email) {
+        return userSupplier.get().orElseThrow(() -> {
+            log.warn("User {} not found", email);
+            return new NotFoundException();
+        });
     }
 
     private static Timestamp getCurrentTimestamp() {
