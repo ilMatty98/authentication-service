@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: authentication-service # Name of container
-          image: "${IMAGE_TAG}" # Image from docker hub
+          image: ilmatty98/authentication-service:latest # Image from docker hub
           imagePullPolicy: Always
           ports:
             - containerPort: 8080 # Port on which the container exposes the service
