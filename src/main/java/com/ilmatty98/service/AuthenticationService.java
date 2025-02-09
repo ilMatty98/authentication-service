@@ -82,7 +82,7 @@ public class AuthenticationService {
 
         var dynamicLabels = Collections.singletonMap("href", endpointFe + "/" + user.getEmail() + "/" + user.getVerificationCode() + "/confirm");
 
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SING_UP, dynamicLabels);
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SING_UP, dynamicLabels, true);
         userRepository.persist(user);
         log.info("End signUp for user {}", signUpDto.getEmail());
         return true;
@@ -116,7 +116,7 @@ public class AuthenticationService {
                 entry("device_value", logInDto.getDeviceType())
         );
 
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.LOG_IN, dynamicLabels);
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.LOG_IN, dynamicLabels, false);
         log.info("End logIn for user {}", logInDto.getEmail());
         return authenticationMapper.newAccessDto(user, token, tokenJwtService.getPublicKey());
     }
@@ -155,7 +155,7 @@ public class AuthenticationService {
         user.setInitializationVector(authenticationMapper.base64EncodingString(changePasswordDto.getNewInitializationVector()));
         user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(changePasswordDto.getNewProtectedSymmetricKey()));
 
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_PSW, new HashMap<>());
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_PSW, new HashMap<>(), true);
         userRepository.persist(user);
         log.info("End changePassword for user {}", email);
         return true;
@@ -166,7 +166,7 @@ public class AuthenticationService {
         var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
 
         var dynamicLabels = Map.ofEntries(entry("hint_value", user.getHint()));
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels);
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels, true);
         log.info("End sendHint for user {}", email);
         return true;
     }
@@ -179,7 +179,7 @@ public class AuthenticationService {
         checkPassword(user, deleteDto.getMasterPasswordHash());
 
         userRepository.delete(user);
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.DELETE_USER, new HashMap<>());
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.DELETE_USER, new HashMap<>(), true);
         log.info("End deleteAccount for user {}", email);
         return true;
     }
@@ -202,10 +202,10 @@ public class AuthenticationService {
         user.setAttempt(0);
 
         var dynamicLabels = Map.ofEntries(entry("email", changeEmailDto.getEmail()));
-        emailService.sendEmail(oldEmail, user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_NOTIFICATION, dynamicLabels);
+        emailService.sendEmail(oldEmail, user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_NOTIFICATION, dynamicLabels, true);
 
         dynamicLabels = Map.ofEntries(entry("code", user.getVerificationCode()));
-        emailService.sendEmail(changeEmailDto.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_CODE, dynamicLabels);
+        emailService.sendEmail(changeEmailDto.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_CODE, dynamicLabels, true);
         userRepository.persist(user);
         log.info("End changeEmail for user {} to {}", oldEmail, changeEmailDto.getEmail());
         return true;
@@ -248,7 +248,7 @@ public class AuthenticationService {
             user.setHash(authenticationMapper.base64Encoding(hash));
             user.setInitializationVector(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewInitializationVector()));
             user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewProtectedSymmetricKey()));
-            emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL, new HashMap<>());
+            emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL, new HashMap<>(), true);
         }
 
         user.setVerificationCode(null);

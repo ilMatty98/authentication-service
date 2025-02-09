@@ -115,7 +115,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
     }
 
     private void verifyLanguage(String language, String expectedSubject, String expectedContainsBody) throws MessagingException {
-        emailService.sendEmail(EMAIL_TO, language, EmailTypeEnum.LOG_IN, new HashMap<>());
+        emailService.sendEmail(EMAIL_TO, language, EmailTypeEnum.LOG_IN, new HashMap<>(), true);
 
         var receivedMessages = greenMail.getReceivedMessages();
         assertTrue(greenMail.waitForIncomingEmail(5000, 1));
@@ -131,7 +131,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
 
     private void verifyEmail(EmailTypeEnum emailType, String expectedSubject, List<String> label,
                              Map<String, String> dynamicLabels) throws MessagingException {
-        emailService.sendEmail(EMAIL_TO, EmailServiceTest.EN, emailType, dynamicLabels);
+        emailService.sendEmail(EMAIL_TO, EmailServiceTest.EN, emailType, dynamicLabels, true);
 
         var receivedMessages = greenMail.getReceivedMessages();
         assertTrue(greenMail.waitForIncomingEmail(5000, 1));
