@@ -1,4 +1,4 @@
-# authentication-service
+# credentials-service
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
@@ -49,7 +49,7 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 ./mvnw package -Dnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/authentication-service-0.0.0-SNAPSHOT-runner`
+You can then execute your native executable with: `./target/credentials-service-0.0.0-SNAPSHOT-runner`
 
 If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
 
@@ -81,10 +81,10 @@ Easily start your REST Web Services.
 
 ```shell script
 docker run -d \
-  --name postgres-authentication \
+  --name postgres-credentials \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=authentication \
+  -e POSTGRES_DB=credentials \
   -p 5432:5432 \
   postgres
 
