@@ -86,8 +86,6 @@ class AccountRepositoryTest extends AuthenticationServiceTests {
                     assertEquals(expectedAccount.getEmail(), u.getEmail());
                     assertEquals(expectedAccount.getSalt(), u.getSalt());
                     assertEquals(expectedAccount.getHash(), u.getHash());
-                    assertEquals(expectedAccount.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
-                    assertEquals(expectedAccount.getInitializationVector(), u.getInitializationVector());
                     testBetweenTimestamp(expectedAccount.getTimestampCreation(), u.getTimestampCreation());
                     testBetweenTimestamp(expectedAccount.getTimestampLastAccess(), u.getTimestampLastAccess());
                     testBetweenTimestamp(expectedAccount.getTimestampPassword(), u.getTimestampPassword());

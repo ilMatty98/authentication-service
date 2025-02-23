@@ -207,8 +207,6 @@ class LogInTest extends AuthenticationServiceTests {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("token", not(emptyOrNullString()))
                 .body("tokenPublicKey", equalTo(tokenJwtService.getPublicKey()))
-                .body("protectedSymmetricKey", equalTo(authenticationMapper.base64DecodingString(account.getProtectedSymmetricKey())))
-                .body("initializationVector", equalTo(authenticationMapper.base64DecodingString(account.getInitializationVector())))
                 .body("language", equalTo(account.getLanguage()))
                 .body("propic", equalTo(account.getPropic()))
                 .body("hint", equalTo(account.getHint()))

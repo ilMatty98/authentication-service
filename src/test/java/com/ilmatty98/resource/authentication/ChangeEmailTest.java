@@ -189,8 +189,6 @@ class ChangeEmailTest extends AuthenticationServiceTests {
         assertEquals(EMAIL, u.getEmail());
         assertEquals(account.getSalt(), u.getSalt());
         assertEquals(account.getHash(), u.getHash());
-        assertEquals(account.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
-        assertEquals(account.getInitializationVector(), u.getInitializationVector());
         testBetweenTimestamp(account.getTimestampCreation(), u.getTimestampCreation());
         assertTrue(account.getTimestampLastAccess().before(u.getTimestampLastAccess()));
         testBetweenTimestamp(account.getTimestampPassword(), u.getTimestampPassword());

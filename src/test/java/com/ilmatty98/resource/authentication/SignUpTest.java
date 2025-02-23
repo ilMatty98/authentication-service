@@ -71,36 +71,6 @@ class SignUpTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testProtectedSymmetricKeyEmpty() {
-        var signUp = fillObject(new SignUpDto());
-        signUp.setEmail(EMAIL);
-        signUp.setProtectedSymmetricKey(null);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(new SignUpDto())
-                .when()
-                .post(SIGN_UP_URL)
-                .then()
-                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
-    }
-
-    @Test
-    void testInitializationVectorEmpty() {
-        var signUp = fillObject(new SignUpDto());
-        signUp.setEmail(EMAIL);
-        signUp.setInitializationVector(null);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(new SignUpDto())
-                .when()
-                .post(SIGN_UP_URL)
-                .then()
-                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
-    }
-
-    @Test
     void testHintEmpty() {
         var signUp = fillObject(new SignUpDto());
         signUp.setEmail(EMAIL);
@@ -249,8 +219,6 @@ class SignUpTest extends AuthenticationServiceTests {
                     assertEquals(signUp.getEmail(), account.getEmail());
                     assertNotNull(account.getSalt());
                     assertNotNull(account.getHash());
-                    assertEquals(signUp.getProtectedSymmetricKey(), authenticationMapper.base64DecodingString(account.getProtectedSymmetricKey()));
-                    assertEquals(signUp.getInitializationVector(), authenticationMapper.base64DecodingString(account.getInitializationVector()));
                     assertNotNull(account.getTimestampCreation());
                     assertNotNull(account.getTimestampLastAccess());
                     assertNotNull(account.getTimestampPassword());

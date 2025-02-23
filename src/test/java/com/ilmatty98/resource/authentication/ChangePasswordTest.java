@@ -193,8 +193,6 @@ class ChangePasswordTest extends AuthenticationServiceTests {
         assertEquals(account.getEmail(), u.getEmail());
         assertNotNull(u.getSalt());
         assertNotNull(u.getHash());
-        assertEquals(changePasswordDto.getNewProtectedSymmetricKey(), authenticationMapper.base64DecodingString(u.getProtectedSymmetricKey()));
-        assertEquals(changePasswordDto.getNewInitializationVector(), authenticationMapper.base64DecodingString(u.getInitializationVector()));
         assertTrue(u.getTimestampPassword().after(account.getTimestampPassword()));
         assertNotNull(u.getTimestampCreation());
         assertNotNull(u.getTimestampLastAccess());

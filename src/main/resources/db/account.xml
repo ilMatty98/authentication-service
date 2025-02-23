@@ -17,8 +17,6 @@
                 EMAIL                   VARCHAR2(100) NOT NULL UNIQUE,
                 SALT                    CLOB         NOT NULL,
                 HASH                    CLOB         NOT NULL,
-                PROTECTED_SYMMETRIC_KEY CLOB         NOT NULL,
-                INITIALIZATION_VECTOR   CLOB         NOT NULL,
                 TIMESTAMP_CREATION      TIMESTAMP(6) NOT NULL,
                 TIMESTAMP_LAST_ACCESS   TIMESTAMP(6) NOT NULL,
                 TIMESTAMP_PASSWORD      TIMESTAMP(6) NOT NULL,
