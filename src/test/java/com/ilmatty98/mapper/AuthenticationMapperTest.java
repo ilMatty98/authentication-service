@@ -3,7 +3,7 @@ package com.ilmatty98.mapper;
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.SignUpDto;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ class AuthenticationMapperTest extends AuthenticationServiceTests {
         var timestamp = Timestamp.from(Instant.now());
         var userStateEnum = UserStateEnum.VERIFIED;
 
-        var user = authenticationMapper.newUser(signUpDto, salt, hash, timestamp, userStateEnum);
+        var user = authenticationMapper.newAccount(signUpDto, salt, hash, timestamp, userStateEnum);
 
         assertNull(user.getId());
         assertEquals(signUpDto.getEmail(), user.getEmail());
@@ -53,7 +53,7 @@ class AuthenticationMapperTest extends AuthenticationServiceTests {
 
     @Test
     void testNewAccessDto() {
-        var user = fillObject(new User());
+        var user = fillObject(new Account());
         var token = generateRandomString(2048);
         var tokenPublicKey = generateRandomString(1024);
 

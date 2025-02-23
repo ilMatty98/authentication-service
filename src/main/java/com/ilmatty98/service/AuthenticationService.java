@@ -5,7 +5,7 @@ import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.*;
 import com.ilmatty98.dto.response.AccessDto;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
 import com.ilmatty98.utils.AuthenticationUtils;
@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -77,11 +78,11 @@ public class AuthenticationService {
         var hash = AuthenticationUtils.generateArgon2id(signUpDto.getMasterPasswordHash(), salt, argon2idSize,
                 argon2idIterations, argon2idMemoryKB, argon2idParallelism);
 
-        var user = authenticationMapper.newUser(signUpDto, salt, hash, getCurrentTimestamp(), UserStateEnum.UNVERIFIED);
+        var user = authenticationMapper.newAccount(signUpDto, salt, hash, getCurrentTimestamp(), UserStateEnum.UNVERIFIED);
 
         var dynamicLabels = Collections.singletonMap("href", endpointFe + "/" + user.getEmail() + "/" + user.getVerificationCode() + "/confirm");
 
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SING_UP, dynamicLabels);
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SING_UP, dynamicLabels, true);
         userRepository.persist(user);
         log.info("End signUp for user {}", signUpDto.getEmail());
         return true;
@@ -90,11 +91,7 @@ public class AuthenticationService {
     @Transactional
     public AccessDto logIn(LogInDto logInDto) {
         log.info("Init logIn for user {}", logInDto.getEmail());
-        var user = userRepository.findByEmail(logInDto.getEmail())
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", logInDto.getEmail());
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmail(logInDto.getEmail()), logInDto.getEmail());
 
         if (UserStateEnum.UNVERIFIED.equals(user.getState())) {
             log.warn("User {} not confirmed", logInDto.getEmail());
@@ -119,7 +116,7 @@ public class AuthenticationService {
                 entry("device_value", logInDto.getDeviceType())
         );
 
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.LOG_IN, dynamicLabels);
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.LOG_IN, dynamicLabels, false);
         log.info("End logIn for user {}", logInDto.getEmail());
         return authenticationMapper.newAccessDto(user, token, tokenJwtService.getPublicKey());
     }
@@ -132,11 +129,7 @@ public class AuthenticationService {
     @Transactional
     public boolean confirmEmail(String email, String code) {
         log.info("Init confirmEmail for user {}", email);
-        var user = userRepository.findByEmailAndVerificationCode(email, code)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndVerificationCode(email, code), email);
 
         user.setState(UserStateEnum.VERIFIED);
         user.setVerificationCode(null);
@@ -148,11 +141,7 @@ public class AuthenticationService {
     @Transactional
     public boolean changePassword(ChangePasswordDto changePasswordDto, String email) {
         log.info("Init changePassword for user {}", email);
-        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
 
         checkPassword(user, changePasswordDto.getCurrentMasterPasswordHash());
 
@@ -166,7 +155,7 @@ public class AuthenticationService {
         user.setInitializationVector(authenticationMapper.base64EncodingString(changePasswordDto.getNewInitializationVector()));
         user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(changePasswordDto.getNewProtectedSymmetricKey()));
 
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_PSW, new HashMap<>());
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_PSW, new HashMap<>(), true);
         userRepository.persist(user);
         log.info("End changePassword for user {}", email);
         return true;
@@ -174,14 +163,10 @@ public class AuthenticationService {
 
     public boolean sendHint(String email) {
         log.info("Init sendHint for user {}", email);
-        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
 
         var dynamicLabels = Map.ofEntries(entry("hint_value", user.getHint()));
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels);
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels, true);
         log.info("End sendHint for user {}", email);
         return true;
     }
@@ -189,16 +174,12 @@ public class AuthenticationService {
     @Transactional
     public boolean deleteAccount(String email, DeleteDto deleteDto) {
         log.info("Init deleteAccount for user {}", email);
-        var user = userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", email);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
 
         checkPassword(user, deleteDto.getMasterPasswordHash());
 
         userRepository.delete(user);
-        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.DELETE_USER, new HashMap<>());
+        emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.DELETE_USER, new HashMap<>(), true);
         log.info("End deleteAccount for user {}", email);
         return true;
     }
@@ -211,11 +192,7 @@ public class AuthenticationService {
             throw new BadRequestException();
         }
 
-        var user = userRepository.findByEmailAndState(oldEmail, UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", oldEmail);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndState(oldEmail, UserStateEnum.VERIFIED), oldEmail);
 
         checkPassword(user, changeEmailDto.getMasterPasswordHash());
 
@@ -225,10 +202,10 @@ public class AuthenticationService {
         user.setAttempt(0);
 
         var dynamicLabels = Map.ofEntries(entry("email", changeEmailDto.getEmail()));
-        emailService.sendEmail(oldEmail, user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_NOTIFICATION, dynamicLabels);
+        emailService.sendEmail(oldEmail, user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_NOTIFICATION, dynamicLabels, true);
 
         dynamicLabels = Map.ofEntries(entry("code", user.getVerificationCode()));
-        emailService.sendEmail(changeEmailDto.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_CODE, dynamicLabels);
+        emailService.sendEmail(changeEmailDto.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_CODE, dynamicLabels, true);
         userRepository.persist(user);
         log.info("End changeEmail for user {} to {}", oldEmail, changeEmailDto.getEmail());
         return true;
@@ -242,11 +219,7 @@ public class AuthenticationService {
             throw new BadRequestException();
         }
 
-        var user = userRepository.findByEmailAndNewEmailAndState(oldEmail, confirmChangeEmailDto.getEmail(), UserStateEnum.VERIFIED)
-                .orElseThrow(() -> {
-                    log.warn("User {} not found", oldEmail);
-                    return new NotFoundException();
-                });
+        var user = getUser(() -> userRepository.findByEmailAndNewEmailAndState(oldEmail, confirmChangeEmailDto.getEmail(), UserStateEnum.VERIFIED), oldEmail);
 
         checkPassword(user, confirmChangeEmailDto.getMasterPasswordHash());
 
@@ -275,7 +248,7 @@ public class AuthenticationService {
             user.setHash(authenticationMapper.base64Encoding(hash));
             user.setInitializationVector(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewInitializationVector()));
             user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewProtectedSymmetricKey()));
-            emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL, new HashMap<>());
+            emailService.sendEmail(user.getEmail(), user.getLanguage(), EmailTypeEnum.CHANGE_EMAIL, new HashMap<>(), true);
         }
 
         user.setVerificationCode(null);
@@ -292,18 +265,39 @@ public class AuthenticationService {
         return true;
     }
 
+    @Transactional
+    public boolean changeInformation(ChangeInformationDto changeInformationDto, String email) {
+        log.info("Init changeInformation for user {}", email);
+        var user = getUser(() -> userRepository.findByEmailAndState(email, UserStateEnum.VERIFIED), email);
+
+        user.setHint(changeInformationDto.getHint());
+        user.setLanguage(changeInformationDto.getLanguage());
+        user.setPropic(changeInformationDto.getPropic());
+        userRepository.persist(user);
+
+        log.info("End changeInformation for user {}", email);
+        return true;
+    }
+
+    private Account getUser(Supplier<Optional<Account>> userSupplier, String email) {
+        return userSupplier.get().orElseThrow(() -> {
+            log.warn("User {} not found", email);
+            return new NotFoundException();
+        });
+    }
+
     private static Timestamp getCurrentTimestamp() {
         return Timestamp.from(Instant.now());
     }
 
-    private void checkPassword(User user, String masterPasswordHash) {
-        var storedHash = Base64.getDecoder().decode(user.getHash());
-        var salt = Base64.getDecoder().decode(user.getSalt());
+    private void checkPassword(Account account, String masterPasswordHash) {
+        var storedHash = Base64.getDecoder().decode(account.getHash());
+        var salt = Base64.getDecoder().decode(account.getSalt());
         var currentHash = AuthenticationUtils.generateArgon2id(masterPasswordHash, salt,
                 argon2idSize, argon2idIterations, argon2idMemoryKB, argon2idParallelism);
 
         if (!Arrays.equals(storedHash, currentHash)) {
-            log.warn("Invalid credentials for user {}", user.getEmail());
+            log.warn("Invalid credentials for user {}", account.getEmail());
             throw new NotAuthorizedException("");
         }
     }

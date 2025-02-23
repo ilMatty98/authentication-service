@@ -1,6 +1,6 @@
 package com.ilmatty98;
 
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import com.ilmatty98.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
@@ -19,16 +19,16 @@ public class UpdateResource {
 
     @GET
     @Path("/{id}")
-    public User getUser(@RestPath Long id) {
+    public Account getUser(@RestPath Long id) {
         return userRepository.findById(id);
     }
 
     @POST
     @Transactional
-    public User saveUser(@RequestBody User user) {
-        user.setId(null);
-        userRepository.persist(user);
-        return user;
+    public Account saveUser(@RequestBody Account account) {
+        account.setId(null);
+        userRepository.persist(account);
+        return account;
     }
 
     @POST

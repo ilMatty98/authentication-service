@@ -7,7 +7,7 @@ import com.ilmatty98.dto.request.ChangeEmailDto;
 import com.ilmatty98.dto.request.LogInDto;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.dto.response.AccessDto;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
 import com.ilmatty98.service.EmailService;
@@ -127,7 +127,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         }
     }
 
-    protected User signUp(String email, String password) {
+    protected Account signUp(String email, String password) {
         var signUp = new SignUpDto();
         signUp.setEmail(email);
         signUp.setMasterPasswordHash(password);
@@ -148,7 +148,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         return userRepository.findByEmail(email).orElseGet(Assertions::fail);
     }
 
-    protected User confirmEmail(String email) {
+    protected Account confirmEmail(String email) {
         var user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
 
         given()
@@ -157,10 +157,10 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+        return getUserById(user.getId());
     }
 
-    protected User changeEmail(String email, String password, String newEmail) {
+    protected Account changeEmail(String email, String password, String newEmail) {
         var changeEmailDto = new ChangeEmailDto();
         changeEmailDto.setEmail(email);
         changeEmailDto.setEmail(newEmail);
@@ -178,7 +178,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         return userRepository.findByEmail(email).orElseGet(Assertions::fail);
     }
 
-    protected User getUserById(Long id) {
+    protected Account getUserById(Long id) {
         return given()
                 .contentType(ContentType.JSON)
                 .when()
@@ -186,13 +186,13 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract()
-                .as(User.class);
+                .as(Account.class);
     }
 
-    protected void saveUser(User user) {
+    protected void saveUser(Account account) {
         given()
                 .contentType(ContentType.JSON)
-                .body(user)
+                .body(account)
                 .when()
                 .post("/user")
                 .then()

@@ -3,7 +3,7 @@ package com.ilmatty98.resource.authentication;
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.ConfirmChangeEmailDto;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.mail.MessagingException;
@@ -391,21 +391,21 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
         assertEquals("Email changed!", emailChanged.getSubject());
     }
 
-    private void checkUser(User user, String email, String verificationCode, String newEmail, Integer attempt) {
-        var u = getUserById(user.getId());
-        assertEquals(user.getId(), u.getId());
+    private void checkUser(Account account, String email, String verificationCode, String newEmail, Integer attempt) {
+        var u = getUserById(account.getId());
+        assertEquals(account.getId(), u.getId());
         assertEquals(email, u.getEmail());
-        assertEquals(user.getSalt(), u.getSalt());
-        assertEquals(user.getHash(), u.getHash());
-        assertEquals(user.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
-        assertEquals(user.getInitializationVector(), u.getInitializationVector());
-        testBetweenTimestamp(user.getTimestampCreation(), u.getTimestampCreation());
-        assertTrue(user.getTimestampLastAccess().before(u.getTimestampLastAccess()));
-        testBetweenTimestamp(user.getTimestampPassword(), u.getTimestampPassword());
+        assertEquals(account.getSalt(), u.getSalt());
+        assertEquals(account.getHash(), u.getHash());
+        assertEquals(account.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
+        assertEquals(account.getInitializationVector(), u.getInitializationVector());
+        testBetweenTimestamp(account.getTimestampCreation(), u.getTimestampCreation());
+        assertTrue(account.getTimestampLastAccess().before(u.getTimestampLastAccess()));
+        testBetweenTimestamp(account.getTimestampPassword(), u.getTimestampPassword());
         assertTrue(u.getTimestampEmail().before(Timestamp.from(Instant.now())));
-        assertEquals(user.getLanguage(), u.getLanguage());
-        assertEquals(user.getHint(), u.getHint());
-        assertEquals(user.getPropic(), u.getPropic());
+        assertEquals(account.getLanguage(), u.getLanguage());
+        assertEquals(account.getHint(), u.getHint());
+        assertEquals(account.getPropic(), u.getPropic());
         assertEquals(UserStateEnum.VERIFIED, u.getState());
         assertEquals(verificationCode, u.getVerificationCode());
         assertEquals(newEmail, u.getNewEmail());
