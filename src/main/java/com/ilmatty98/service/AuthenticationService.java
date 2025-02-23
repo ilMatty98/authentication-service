@@ -5,7 +5,7 @@ import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.constants.UserStateEnum;
 import com.ilmatty98.dto.request.*;
 import com.ilmatty98.dto.response.AccessDto;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.UserRepository;
 import com.ilmatty98.utils.AuthenticationUtils;
@@ -78,7 +78,7 @@ public class AuthenticationService {
         var hash = AuthenticationUtils.generateArgon2id(signUpDto.getMasterPasswordHash(), salt, argon2idSize,
                 argon2idIterations, argon2idMemoryKB, argon2idParallelism);
 
-        var user = authenticationMapper.newUser(signUpDto, salt, hash, getCurrentTimestamp(), UserStateEnum.UNVERIFIED);
+        var user = authenticationMapper.newAccount(signUpDto, salt, hash, getCurrentTimestamp(), UserStateEnum.UNVERIFIED);
 
         var dynamicLabels = Collections.singletonMap("href", endpointFe + "/" + user.getEmail() + "/" + user.getVerificationCode() + "/confirm");
 
@@ -279,7 +279,7 @@ public class AuthenticationService {
         return true;
     }
 
-    private User getUser(Supplier<Optional<User>> userSupplier, String email) {
+    private Account getUser(Supplier<Optional<Account>> userSupplier, String email) {
         return userSupplier.get().orElseThrow(() -> {
             log.warn("User {} not found", email);
             return new NotFoundException();
@@ -290,14 +290,14 @@ public class AuthenticationService {
         return Timestamp.from(Instant.now());
     }
 
-    private void checkPassword(User user, String masterPasswordHash) {
-        var storedHash = Base64.getDecoder().decode(user.getHash());
-        var salt = Base64.getDecoder().decode(user.getSalt());
+    private void checkPassword(Account account, String masterPasswordHash) {
+        var storedHash = Base64.getDecoder().decode(account.getHash());
+        var salt = Base64.getDecoder().decode(account.getSalt());
         var currentHash = AuthenticationUtils.generateArgon2id(masterPasswordHash, salt,
                 argon2idSize, argon2idIterations, argon2idMemoryKB, argon2idParallelism);
 
         if (!Arrays.equals(storedHash, currentHash)) {
-            log.warn("Invalid credentials for user {}", user.getEmail());
+            log.warn("Invalid credentials for user {}", account.getEmail());
             throw new NotAuthorizedException("");
         }
     }

@@ -6,14 +6,14 @@
     <changeSet id="1" author="ilMatty98">
         <!-- Create the sequence for the auto increment -->
         <sql>
-            CREATE SEQUENCE users_seq START WITH 1;
+            CREATE SEQUENCE account_seq START WITH 1;
         </sql>
 
-        <!-- Create table users -->
+        <!-- Create table account -->
         <sql>
-            create table USERS
+            create table ACCOUNT
             (
-                ID                      NUMBER(38) DEFAULT users_seq.nextval NOT NULL,
+                ID NUMBER(38) DEFAULT account_seq.nextval NOT NULL,
                 EMAIL                   VARCHAR2(100) NOT NULL UNIQUE,
                 SALT                    CLOB         NOT NULL,
                 HASH                    CLOB         NOT NULL,
@@ -33,14 +33,14 @@
             )
         </sql>
 
-        <!-- Create the sequence for the auto increment -->
+        <!-- Create constraint to add primary key -->
         <sql>
-            ALTER TABLE USERS ADD (CONSTRAINT users_pk PRIMARY KEY (ID));
+            ALTER TABLE ACCOUNT ADD (CONSTRAINT account_pk PRIMARY KEY (ID));
         </sql>
 
         <!-- Add a CHECK constraint on the 'state' column -->
         <sql>
-            ALTER TABLE USERS
+            ALTER TABLE ACCOUNT
                 ADD CONSTRAINT state_check CHECK (STATE IN ('UNVERIFIED', 'VERIFIED'));
         </sql>
     </changeSet>

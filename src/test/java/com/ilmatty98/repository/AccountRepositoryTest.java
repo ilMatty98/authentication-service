@@ -2,7 +2,7 @@ package com.ilmatty98.repository;
 
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.UserStateEnum;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
-class UserRepositoryTest extends AuthenticationServiceTests {
+class AccountRepositoryTest extends AuthenticationServiceTests {
 
     @Test
     void testExistsByEmail() {
@@ -79,23 +79,23 @@ class UserRepositoryTest extends AuthenticationServiceTests {
         checkUser((userRepository) -> userRepository.findByEmailAndVerificationCode(EMAIL, "code"), user);
     }
 
-    private void checkUser(Function<UserRepository, Optional<User>> userRepositoryFunction, User expectedUser) {
+    private void checkUser(Function<UserRepository, Optional<Account>> userRepositoryFunction, Account expectedAccount) {
         userRepositoryFunction.apply(userRepository)
                 .ifPresentOrElse(u -> {
-                    assertEquals(expectedUser.getId(), u.getId());
-                    assertEquals(expectedUser.getEmail(), u.getEmail());
-                    assertEquals(expectedUser.getSalt(), u.getSalt());
-                    assertEquals(expectedUser.getHash(), u.getHash());
-                    assertEquals(expectedUser.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
-                    assertEquals(expectedUser.getInitializationVector(), u.getInitializationVector());
-                    testBetweenTimestamp(expectedUser.getTimestampCreation(), u.getTimestampCreation());
-                    testBetweenTimestamp(expectedUser.getTimestampLastAccess(), u.getTimestampLastAccess());
-                    testBetweenTimestamp(expectedUser.getTimestampPassword(), u.getTimestampPassword());
-                    assertEquals(expectedUser.getLanguage(), u.getLanguage());
-                    assertEquals(expectedUser.getHint(), u.getHint());
-                    assertEquals(expectedUser.getPropic(), u.getPropic());
-                    assertEquals(expectedUser.getState(), u.getState());
-                    assertEquals(expectedUser.getVerificationCode(), u.getVerificationCode());
+                    assertEquals(expectedAccount.getId(), u.getId());
+                    assertEquals(expectedAccount.getEmail(), u.getEmail());
+                    assertEquals(expectedAccount.getSalt(), u.getSalt());
+                    assertEquals(expectedAccount.getHash(), u.getHash());
+                    assertEquals(expectedAccount.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
+                    assertEquals(expectedAccount.getInitializationVector(), u.getInitializationVector());
+                    testBetweenTimestamp(expectedAccount.getTimestampCreation(), u.getTimestampCreation());
+                    testBetweenTimestamp(expectedAccount.getTimestampLastAccess(), u.getTimestampLastAccess());
+                    testBetweenTimestamp(expectedAccount.getTimestampPassword(), u.getTimestampPassword());
+                    assertEquals(expectedAccount.getLanguage(), u.getLanguage());
+                    assertEquals(expectedAccount.getHint(), u.getHint());
+                    assertEquals(expectedAccount.getPropic(), u.getPropic());
+                    assertEquals(expectedAccount.getState(), u.getState());
+                    assertEquals(expectedAccount.getVerificationCode(), u.getVerificationCode());
                 }, Assertions::fail);
     }
 
