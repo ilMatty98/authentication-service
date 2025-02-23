@@ -16,6 +16,8 @@ import java.util.UUID;
 public interface AuthenticationMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "cards", ignore = true)
+    @Mapping(target = "logins", ignore = true)
     @Mapping(target = "attempt", ignore = true)
     @Mapping(target = "newEmail", ignore = true)
     @Mapping(target = "hint", source = "signUpDto.hint")
