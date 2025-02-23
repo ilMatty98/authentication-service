@@ -2,7 +2,7 @@ package com.ilmatty98.resource.authentication;
 
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.request.ChangeEmailDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -61,18 +61,18 @@ class ChangeEmailTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testUserNotFoundForEmail() {
-        var user = signUp(EMAIL, PASSWORD);
-        user = confirmEmail(EMAIL);
+    void testAccountNotFoundForEmail() {
+        var account = signUp(EMAIL, PASSWORD);
+        account = confirmEmail(EMAIL);
         var changeEmailDto = new ChangeEmailDto();
         changeEmailDto.setEmail("test2@test.com");
         changeEmailDto.setMasterPasswordHash(PASSWORD);
 
         var token = getTokenFromLogIn(EMAIL, PASSWORD);
 
-        deleteUserById(user.getId());
-        user.setEmail(EMAIL + ".");
-        saveUser(user);
+        deleteAccountById(account.getId());
+        account.setEmail(EMAIL + ".");
+        saveAccount(account);
 
         given()
                 .contentType(ContentType.JSON)
@@ -85,18 +85,18 @@ class ChangeEmailTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testUserNotFoundForState() {
-        var user = signUp(EMAIL, PASSWORD);
-        user = confirmEmail(EMAIL);
+    void testAccountNotFoundForState() {
+        var account = signUp(EMAIL, PASSWORD);
+        account = confirmEmail(EMAIL);
         var changeEmailDto = new ChangeEmailDto();
         changeEmailDto.setEmail("test2@test.com");
         changeEmailDto.setMasterPasswordHash(PASSWORD);
 
         var token = getTokenFromLogIn(EMAIL, PASSWORD);
 
-        deleteUserById(user.getId());
-        user.setState(UserStateEnum.UNVERIFIED);
-        saveUser(user);
+        deleteAccountById(account.getId());
+        account.setState(AccountStateEnum.UNVERIFIED);
+        saveAccount(account);
 
         given()
                 .contentType(ContentType.JSON)
@@ -170,7 +170,7 @@ class ChangeEmailTest extends AuthenticationServiceTests {
     void testChangeEmail() throws MessagingException {
         var newEmail = "test2@test.com";
         signUp(EMAIL, PASSWORD);
-        final var user = confirmEmail(EMAIL);
+        final var account = confirmEmail(EMAIL);
         var changeEmailDto = new ChangeEmailDto();
         changeEmailDto.setEmail(newEmail);
         changeEmailDto.setMasterPasswordHash(PASSWORD);
@@ -184,21 +184,21 @@ class ChangeEmailTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        var u = getUserById(user.getId());
-        assertEquals(user.getId(), u.getId());
+        var u = getAccountById(account.getId());
+        assertEquals(account.getId(), u.getId());
         assertEquals(EMAIL, u.getEmail());
-        assertEquals(user.getSalt(), u.getSalt());
-        assertEquals(user.getHash(), u.getHash());
-        assertEquals(user.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
-        assertEquals(user.getInitializationVector(), u.getInitializationVector());
-        testBetweenTimestamp(user.getTimestampCreation(), u.getTimestampCreation());
-        assertTrue(user.getTimestampLastAccess().before(u.getTimestampLastAccess()));
-        testBetweenTimestamp(user.getTimestampPassword(), u.getTimestampPassword());
-        assertTrue(user.getTimestampEmail().before(u.getTimestampEmail()));
-        assertEquals(user.getLanguage(), u.getLanguage());
-        assertEquals(user.getHint(), u.getHint());
-        assertEquals(user.getPropic(), u.getPropic());
-        assertEquals(UserStateEnum.VERIFIED, u.getState());
+        assertEquals(account.getSalt(), u.getSalt());
+        assertEquals(account.getHash(), u.getHash());
+        assertEquals(account.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
+        assertEquals(account.getInitializationVector(), u.getInitializationVector());
+        testBetweenTimestamp(account.getTimestampCreation(), u.getTimestampCreation());
+        assertTrue(account.getTimestampLastAccess().before(u.getTimestampLastAccess()));
+        testBetweenTimestamp(account.getTimestampPassword(), u.getTimestampPassword());
+        assertTrue(account.getTimestampEmail().before(u.getTimestampEmail()));
+        assertEquals(account.getLanguage(), u.getLanguage());
+        assertEquals(account.getHint(), u.getHint());
+        assertEquals(account.getPropic(), u.getPropic());
+        assertEquals(AccountStateEnum.VERIFIED, u.getState());
         assertNotNull(u.getVerificationCode());
         assertEquals(newEmail, u.getNewEmail());
         assertEquals(0, u.getAttempt());

@@ -1,15 +1,17 @@
 package com.ilmatty98.entity;
 
 
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "account")
+@ToString(exclude = {"logins", "cards"})
 public class Account {
 
     @Id
@@ -54,7 +56,7 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", length = 10, nullable = false)
-    private UserStateEnum state;
+    private AccountStateEnum state;
 
     @Column(name = "verification_code", length = 36)
     private String verificationCode;
@@ -64,4 +66,10 @@ public class Account {
 
     @Column(name = "new_email", length = 100, unique = true)
     private String newEmail;
+
+    @OneToMany(mappedBy = "account")
+    private List<Login> logins;
+
+    @OneToMany(mappedBy = "account")
+    private List<Card> cards;
 }

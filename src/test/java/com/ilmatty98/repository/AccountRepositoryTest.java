@@ -1,7 +1,7 @@
 package com.ilmatty98.repository;
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.transaction.Transactional;
@@ -20,67 +20,67 @@ class AccountRepositoryTest extends AuthenticationServiceTests {
 
     @Test
     void testExistsByEmail() {
-        assertFalse(userRepository.existsByEmail(EMAIL));
+        assertFalse(accountRepository.existsByEmail(EMAIL));
         signUp(EMAIL, PASSWORD);
-        assertTrue(userRepository.existsByEmail(EMAIL));
+        assertTrue(accountRepository.existsByEmail(EMAIL));
     }
 
     @Test
     void testFindByEmail() {
-        assertFalse(userRepository.findByEmail(EMAIL).isPresent());
-        var user = signUp(EMAIL, PASSWORD);
-        checkUser((userRepository) -> userRepository.findByEmail(EMAIL), user);
+        assertFalse(accountRepository.findByEmail(EMAIL).isPresent());
+        var account = signUp(EMAIL, PASSWORD);
+        checkAccount((accountRepository) -> accountRepository.findByEmail(EMAIL), account);
     }
 
     @Test
     @Transactional
     void testFindByEmailAndState() {
-        var user = signUp(EMAIL, PASSWORD);
-        user.setState(UserStateEnum.UNVERIFIED);
-        userRepository.persist(user);
+        var account = signUp(EMAIL, PASSWORD);
+        account.setState(AccountStateEnum.UNVERIFIED);
+        accountRepository.persist(account);
 
-        assertFalse(userRepository.findByEmailAndState(EMAIL, UserStateEnum.VERIFIED).isPresent());
+        assertFalse(accountRepository.findByEmailAndState(EMAIL, AccountStateEnum.VERIFIED).isPresent());
 
-        user.setState(UserStateEnum.VERIFIED);
-        userRepository.persist(user);
+        account.setState(AccountStateEnum.VERIFIED);
+        accountRepository.persist(account);
 
-        checkUser((userRepository) -> userRepository.findByEmailAndState(EMAIL, UserStateEnum.VERIFIED), user);
+        checkAccount((accountRepository) -> accountRepository.findByEmailAndState(EMAIL, AccountStateEnum.VERIFIED), account);
     }
 
     @Test
     @Transactional
     void findByEmailAndNewEmailAndState() {
         var newEmail = EMAIL + ".";
-        var user = signUp(EMAIL, PASSWORD);
-        user.setState(UserStateEnum.UNVERIFIED);
-        user.setNewEmail(newEmail);
-        userRepository.persist(user);
+        var account = signUp(EMAIL, PASSWORD);
+        account.setState(AccountStateEnum.UNVERIFIED);
+        account.setNewEmail(newEmail);
+        accountRepository.persist(account);
 
-        assertFalse(userRepository.findByEmailAndNewEmailAndState(EMAIL, newEmail, UserStateEnum.VERIFIED).isPresent());
+        assertFalse(accountRepository.findByEmailAndNewEmailAndState(EMAIL, newEmail, AccountStateEnum.VERIFIED).isPresent());
 
-        user.setState(UserStateEnum.VERIFIED);
-        userRepository.persist(user);
+        account.setState(AccountStateEnum.VERIFIED);
+        accountRepository.persist(account);
 
-        checkUser((userRepository) -> userRepository.findByEmailAndNewEmailAndState(EMAIL, newEmail, UserStateEnum.VERIFIED), user);
+        checkAccount((accountRepository) -> accountRepository.findByEmailAndNewEmailAndState(EMAIL, newEmail, AccountStateEnum.VERIFIED), account);
     }
 
     @Test
     @Transactional
     void testFindByEmailAndVerificationCode() {
-        var user = signUp(EMAIL, PASSWORD);
-        user.setVerificationCode("code1");
-        userRepository.persist(user);
+        var account = signUp(EMAIL, PASSWORD);
+        account.setVerificationCode("code1");
+        accountRepository.persist(account);
 
-        assertFalse(userRepository.findByEmailAndVerificationCode(EMAIL, "code").isPresent());
+        assertFalse(accountRepository.findByEmailAndVerificationCode(EMAIL, "code").isPresent());
 
-        user.setVerificationCode("code");
-        userRepository.persist(user);
+        account.setVerificationCode("code");
+        accountRepository.persist(account);
 
-        checkUser((userRepository) -> userRepository.findByEmailAndVerificationCode(EMAIL, "code"), user);
+        checkAccount((accountRepository) -> accountRepository.findByEmailAndVerificationCode(EMAIL, "code"), account);
     }
 
-    private void checkUser(Function<UserRepository, Optional<Account>> userRepositoryFunction, Account expectedAccount) {
-        userRepositoryFunction.apply(userRepository)
+    private void checkAccount(Function<AccountRepository, Optional<Account>> accountRepositoryFunction, Account expectedAccount) {
+        accountRepositoryFunction.apply(accountRepository)
                 .ifPresentOrElse(u -> {
                     assertEquals(expectedAccount.getId(), u.getId());
                     assertEquals(expectedAccount.getEmail(), u.getEmail());

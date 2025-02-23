@@ -1,7 +1,7 @@
 package com.ilmatty98.resource.authentication;
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.request.ConfirmChangeEmailDto;
 import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
@@ -206,7 +206,7 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testUserNotFound() {
+    void testAccountNotFound() {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
         changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
@@ -257,13 +257,13 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
     void testTimeOut() {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
-        var user = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
+        var account = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
 
-        user = getUserById(user.getId());
-        user.setTimestampEmail(Timestamp.valueOf(user.getTimestampEmail().toLocalDateTime().minusHours(1)));
-        deleteUserById(user.getId());
-        saveUser(user);
-        user.setId(user.getId() + 1);
+        account = getAccountById(account.getId());
+        account.setTimestampEmail(Timestamp.valueOf(account.getTimestampEmail().toLocalDateTime().minusHours(1)));
+        deleteAccountById(account.getId());
+        saveAccount(account);
+        account.setId(account.getId() + 1);
 
         var confirmChangeEmailDto = new ConfirmChangeEmailDto();
         confirmChangeEmailDto.setEmail(NEW_EMAIL);
@@ -282,20 +282,20 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
 
-        checkUser(user, EMAIL, null, null, null);
+        checkAccount(account, EMAIL, null, null, null);
     }
 
     @Test
     void testLimitAttempts() {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
-        var user = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
+        var account = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
 
-        user = getUserById(user.getId());
-        user.setAttempt(10);
-        deleteUserById(user.getId());
-        saveUser(user);
-        user.setId(user.getId() + 1);
+        account = getAccountById(account.getId());
+        account.setAttempt(10);
+        deleteAccountById(account.getId());
+        saveAccount(account);
+        account.setId(account.getId() + 1);
 
         var confirmChangeEmailDto = new ConfirmChangeEmailDto();
         confirmChangeEmailDto.setEmail(NEW_EMAIL);
@@ -314,16 +314,16 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
 
-        checkUser(user, EMAIL, null, null, null);
+        checkAccount(account, EMAIL, null, null, null);
     }
 
     @Test
     void testIncorrectVerificationCode() {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
-        var user = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
+        var account = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
 
-        user = getUserById(user.getId());
+        account = getAccountById(account.getId());
 
         var confirmChangeEmailDto = new ConfirmChangeEmailDto();
         confirmChangeEmailDto.setEmail(NEW_EMAIL);
@@ -342,21 +342,21 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
 
-        checkUser(user, EMAIL, user.getVerificationCode(), NEW_EMAIL, 1);
+        checkAccount(account, EMAIL, account.getVerificationCode(), NEW_EMAIL, 1);
     }
 
     @Test
     void testConfirmChangeEmail() throws MessagingException {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
-        var user = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
+        var account = changeEmail(EMAIL, PASSWORD, NEW_EMAIL);
 
-        user = getUserById(user.getId());
+        account = getAccountById(account.getId());
 
         var confirmChangeEmailDto = new ConfirmChangeEmailDto();
         confirmChangeEmailDto.setEmail(NEW_EMAIL);
         confirmChangeEmailDto.setMasterPasswordHash(PASSWORD);
-        confirmChangeEmailDto.setVerificationCode(user.getVerificationCode());
+        confirmChangeEmailDto.setVerificationCode(account.getVerificationCode());
         confirmChangeEmailDto.setNewMasterPasswordHash("new masterPasswordHash");
         confirmChangeEmailDto.setNewProtectedSymmetricKey("new protectedSymmetricKey");
         confirmChangeEmailDto.setNewInitializationVector("new initializationVector");
@@ -370,12 +370,12 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        var u = getUserById(user.getId());
-        user.setSalt(u.getSalt());
-        user.setHash(u.getHash());
-        user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString("new protectedSymmetricKey"));
-        user.setInitializationVector(authenticationMapper.base64EncodingString("new initializationVector"));
-        checkUser(user, NEW_EMAIL, null, null, null);
+        var u = getAccountById(account.getId());
+        account.setSalt(u.getSalt());
+        account.setHash(u.getHash());
+        account.setProtectedSymmetricKey(authenticationMapper.base64EncodingString("new protectedSymmetricKey"));
+        account.setInitializationVector(authenticationMapper.base64EncodingString("new initializationVector"));
+        checkAccount(account, NEW_EMAIL, null, null, null);
 
         assertNotNull(getTokenFromLogIn(NEW_EMAIL, "new masterPasswordHash"));
 
@@ -391,8 +391,8 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
         assertEquals("Email changed!", emailChanged.getSubject());
     }
 
-    private void checkUser(Account account, String email, String verificationCode, String newEmail, Integer attempt) {
-        var u = getUserById(account.getId());
+    private void checkAccount(Account account, String email, String verificationCode, String newEmail, Integer attempt) {
+        var u = getAccountById(account.getId());
         assertEquals(account.getId(), u.getId());
         assertEquals(email, u.getEmail());
         assertEquals(account.getSalt(), u.getSalt());
@@ -406,7 +406,7 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
         assertEquals(account.getLanguage(), u.getLanguage());
         assertEquals(account.getHint(), u.getHint());
         assertEquals(account.getPropic(), u.getPropic());
-        assertEquals(UserStateEnum.VERIFIED, u.getState());
+        assertEquals(AccountStateEnum.VERIFIED, u.getState());
         assertEquals(verificationCode, u.getVerificationCode());
         assertEquals(newEmail, u.getNewEmail());
         assertEquals(attempt, u.getAttempt());

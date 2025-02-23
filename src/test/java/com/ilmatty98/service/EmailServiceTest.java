@@ -107,11 +107,11 @@ class EmailServiceTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testDeleteUser() throws MessagingException {
+    void testDeleteAccount() throws MessagingException {
         var expectedSubject = "Successfully deleted your Credential Manager account!";
         var label = List.of("Your account has been deleted", "Successfully deleted your Credential Manager account!", "Credentials Manager");
 
-        verifyEmail(EmailTypeEnum.DELETE_USER, expectedSubject, label, new HashMap<>());
+        verifyEmail(EmailTypeEnum.DELETE_ACCOUNT, expectedSubject, label, new HashMap<>());
     }
 
     private void verifyLanguage(String language, String expectedSubject, String expectedContainsBody) throws MessagingException {

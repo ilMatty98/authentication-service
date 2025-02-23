@@ -1,6 +1,6 @@
 package com.ilmatty98.mapper;
 
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.request.SignUpDto;
 import com.ilmatty98.dto.response.AccessDto;
 import com.ilmatty98.entity.Account;
@@ -32,7 +32,7 @@ public interface AuthenticationMapper {
     @Mapping(target = "hash", source = "hash", qualifiedByName = "base64Encoding")
     @Mapping(target = "initializationVector", source = "signUpDto.initializationVector", qualifiedByName = "base64EncodingString")
     @Mapping(target = "protectedSymmetricKey", source = "signUpDto.protectedSymmetricKey", qualifiedByName = "base64EncodingString")
-    Account newAccount(SignUpDto signUpDto, byte[] salt, byte[] hash, Timestamp timestamp, UserStateEnum accountStateEnum);
+    Account newAccount(SignUpDto signUpDto, byte[] salt, byte[] hash, Timestamp timestamp, AccountStateEnum accountStateEnum);
 
     @Mapping(target = "token", source = "token")
     @Mapping(target = "hint", source = "account.hint")
