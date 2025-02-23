@@ -1,9 +1,9 @@
 package com.ilmatty98.mapper;
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.request.SignUpDto;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthenticationMapperTest extends AuthenticationServiceTests {
 
     @Test
-    void testNewUser() {
+    void testNewAccount() {
         final var secureRandom = new SecureRandom();
         var signUpDto = fillObject(new SignUpDto());
 
@@ -31,48 +31,39 @@ class AuthenticationMapperTest extends AuthenticationServiceTests {
         secureRandom.nextBytes(hash);
 
         var timestamp = Timestamp.from(Instant.now());
-        var userStateEnum = UserStateEnum.VERIFIED;
+        var accountStateEnum = AccountStateEnum.VERIFIED;
 
-        var user = authenticationMapper.newUser(signUpDto, salt, hash, timestamp, userStateEnum);
+        var account = authenticationMapper.newAccount(signUpDto, salt, hash, timestamp, accountStateEnum);
 
-        assertNull(user.getId());
-        assertEquals(signUpDto.getEmail(), user.getEmail());
-        assertEquals(authenticationMapper.base64Encoding(salt), user.getSalt());
-        assertEquals(authenticationMapper.base64Encoding(hash), user.getHash());
-        assertEquals(authenticationMapper.base64EncodingString(signUpDto.getProtectedSymmetricKey()), user.getProtectedSymmetricKey());
-        assertEquals(authenticationMapper.base64EncodingString(signUpDto.getInitializationVector()), user.getInitializationVector());
-        assertEquals(timestamp, user.getTimestampCreation());
-        assertEquals(timestamp, user.getTimestampLastAccess());
-        assertEquals(timestamp, user.getTimestampPassword());
-        assertEquals(signUpDto.getLanguage(), user.getLanguage());
-        assertEquals(userStateEnum, user.getState());
-        assertEquals(signUpDto.getHint(), user.getHint());
-        assertEquals(signUpDto.getPropic(), user.getPropic());
-        assertNotNull(user.getVerificationCode());
+        assertNull(account.getId());
+        assertEquals(signUpDto.getEmail(), account.getEmail());
+        assertEquals(authenticationMapper.base64Encoding(salt), account.getSalt());
+        assertEquals(authenticationMapper.base64Encoding(hash), account.getHash());
+        assertEquals(timestamp, account.getTimestampCreation());
+        assertEquals(timestamp, account.getTimestampLastAccess());
+        assertEquals(timestamp, account.getTimestampPassword());
+        assertEquals(signUpDto.getLanguage(), account.getLanguage());
+        assertEquals(accountStateEnum, account.getState());
+        assertEquals(signUpDto.getHint(), account.getHint());
+        assertEquals(signUpDto.getPropic(), account.getPropic());
+        assertNotNull(account.getVerificationCode());
     }
 
     @Test
     void testNewAccessDto() {
-        var user = fillObject(new User());
+        var account = fillObject(new Account());
         var token = generateRandomString(2048);
         var tokenPublicKey = generateRandomString(1024);
 
-        var protectedSymmetricKey = user.getProtectedSymmetricKey();
-        var initializationVector = user.getInitializationVector();
-        user.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(protectedSymmetricKey));
-        user.setInitializationVector(authenticationMapper.base64EncodingString(initializationVector));
-
-        var loginDto = authenticationMapper.newAccessDto(user, token, tokenPublicKey);
+        var loginDto = authenticationMapper.newAccessDto(account, token, tokenPublicKey);
 
         assertEquals(token, loginDto.getToken());
         assertEquals(tokenPublicKey, loginDto.getTokenPublicKey());
-        assertEquals(protectedSymmetricKey, loginDto.getProtectedSymmetricKey());
-        assertEquals(initializationVector, loginDto.getInitializationVector());
-        assertEquals(user.getLanguage(), loginDto.getLanguage());
-        assertEquals(user.getPropic(), loginDto.getPropic());
-        assertEquals(user.getTimestampCreation(), loginDto.getTimestampCreation());
-        assertEquals(user.getTimestampLastAccess(), loginDto.getTimestampLastAccess());
-        assertEquals(user.getTimestampPassword(), loginDto.getTimestampPassword());
+        assertEquals(account.getLanguage(), loginDto.getLanguage());
+        assertEquals(account.getPropic(), loginDto.getPropic());
+        assertEquals(account.getTimestampCreation(), loginDto.getTimestampCreation());
+        assertEquals(account.getTimestampLastAccess(), loginDto.getTimestampLastAccess());
+        assertEquals(account.getTimestampPassword(), loginDto.getTimestampPassword());
     }
 
     @Test

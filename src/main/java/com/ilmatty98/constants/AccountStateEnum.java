@@ -1,6 +1,6 @@
 package com.ilmatty98.constants;
 
-public enum UserStateEnum {
+public enum AccountStateEnum {
     UNVERIFIED,
     VERIFIED
 }

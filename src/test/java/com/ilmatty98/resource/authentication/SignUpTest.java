@@ -2,7 +2,7 @@ package com.ilmatty98.resource.authentication;
 
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.request.SignUpDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -60,36 +60,6 @@ class SignUpTest extends AuthenticationServiceTests {
         var signUp = fillObject(new SignUpDto());
         signUp.setEmail(EMAIL);
         signUp.setMasterPasswordHash(null);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(new SignUpDto())
-                .when()
-                .post(SIGN_UP_URL)
-                .then()
-                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
-    }
-
-    @Test
-    void testProtectedSymmetricKeyEmpty() {
-        var signUp = fillObject(new SignUpDto());
-        signUp.setEmail(EMAIL);
-        signUp.setProtectedSymmetricKey(null);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(new SignUpDto())
-                .when()
-                .post(SIGN_UP_URL)
-                .then()
-                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
-    }
-
-    @Test
-    void testInitializationVectorEmpty() {
-        var signUp = fillObject(new SignUpDto());
-        signUp.setEmail(EMAIL);
-        signUp.setInitializationVector(null);
 
         given()
                 .contentType(ContentType.JSON)
@@ -242,26 +212,24 @@ class SignUpTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        //Check user
-        userRepository.findByEmail(signUp.getEmail())
-                .ifPresentOrElse(user -> {
-                    assertNotNull(user.getId());
-                    assertEquals(signUp.getEmail(), user.getEmail());
-                    assertNotNull(user.getSalt());
-                    assertNotNull(user.getHash());
-                    assertEquals(signUp.getProtectedSymmetricKey(), authenticationMapper.base64DecodingString(user.getProtectedSymmetricKey()));
-                    assertEquals(signUp.getInitializationVector(), authenticationMapper.base64DecodingString(user.getInitializationVector()));
-                    assertNotNull(user.getTimestampCreation());
-                    assertNotNull(user.getTimestampLastAccess());
-                    assertNotNull(user.getTimestampPassword());
-                    assertNotNull(user.getTimestampEmail());
-                    assertEquals(signUp.getLanguage(), user.getLanguage());
-                    assertEquals(signUp.getHint(), user.getHint());
-                    assertEquals(signUp.getPropic(), user.getPropic());
-                    assertEquals(UserStateEnum.UNVERIFIED, user.getState());
-                    assertNotNull(user.getVerificationCode());
-                    assertNull(user.getNewEmail());
-                    assertNull(user.getAttempt());
+        //Check account
+        accountRepository.findByEmail(signUp.getEmail())
+                .ifPresentOrElse(account -> {
+                    assertNotNull(account.getId());
+                    assertEquals(signUp.getEmail(), account.getEmail());
+                    assertNotNull(account.getSalt());
+                    assertNotNull(account.getHash());
+                    assertNotNull(account.getTimestampCreation());
+                    assertNotNull(account.getTimestampLastAccess());
+                    assertNotNull(account.getTimestampPassword());
+                    assertNotNull(account.getTimestampEmail());
+                    assertEquals(signUp.getLanguage(), account.getLanguage());
+                    assertEquals(signUp.getHint(), account.getHint());
+                    assertEquals(signUp.getPropic(), account.getPropic());
+                    assertEquals(AccountStateEnum.UNVERIFIED, account.getState());
+                    assertNotNull(account.getVerificationCode());
+                    assertNull(account.getNewEmail());
+                    assertNull(account.getAttempt());
                 }, Assertions::fail);
 
         //Check email

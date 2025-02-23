@@ -11,10 +11,6 @@ public class AccessDto {
 
     private String tokenPublicKey;
 
-    private String protectedSymmetricKey;
-
-    private String initializationVector;
-
     private String language;
 
     private String propic;

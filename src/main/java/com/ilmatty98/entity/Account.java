@@ -1,16 +1,18 @@
 package com.ilmatty98.entity;
 
 
-import com.ilmatty98.constants.UserStateEnum;
+import com.ilmatty98.constants.AccountStateEnum;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "users")
-public class User {
+@ToString(exclude = {"logins", "cards"})
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,17 +21,11 @@ public class User {
     @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "salt", length = 500, nullable = false)
+    @Column(name = "salt", nullable = false, columnDefinition = "CLOB")
     private String salt;
 
-    @Column(name = "hash", length = 500, nullable = false)
+    @Column(name = "hash", nullable = false, columnDefinition = "CLOB")
     private String hash;
-
-    @Column(name = "protected_symmetric_key", length = 500, nullable = false)
-    private String protectedSymmetricKey;
-
-    @Column(name = "initialization_vector", length = 500, nullable = false)
-    private String initializationVector;
 
     @Column(name = "timestamp_creation", nullable = false)
     private Timestamp timestampCreation;
@@ -46,7 +42,7 @@ public class User {
     @Column(name = "hint", length = 100, nullable = false)
     private String hint;
 
-    @Column(name = "propic", length = 500, nullable = false)
+    @Column(name = "propic", nullable = false, columnDefinition = "CLOB")
     private String propic;
 
     @Column(name = "language", length = 2, nullable = false)
@@ -54,7 +50,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", length = 10, nullable = false)
-    private UserStateEnum state;
+    private AccountStateEnum state;
 
     @Column(name = "verification_code", length = 36)
     private String verificationCode;
@@ -64,4 +60,10 @@ public class User {
 
     @Column(name = "new_email", length = 100, unique = true)
     private String newEmail;
+
+    @OneToMany(mappedBy = "account")
+    private List<Login> logins;
+
+    @OneToMany(mappedBy = "account")
+    private List<Card> cards;
 }

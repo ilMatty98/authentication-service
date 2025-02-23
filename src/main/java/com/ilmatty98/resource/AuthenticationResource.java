@@ -15,7 +15,7 @@ import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.Optional;
 
-import static com.ilmatty98.constants.UrlConstants.*;
+import static com.ilmatty98.constants.UrlConstants.Authentication.*;
 
 @RequiredArgsConstructor
 @Path(BASE_PATH_AUTHENTICATION)
@@ -89,6 +89,14 @@ public class AuthenticationResource {
         return authenticationService.confirmChangeEmail(confirmChangeEmailDto, email);
     }
 
+    @PUT
+    @BearerAuthenticated
+    @Path(CHANGE_INFORMATION)
+    public boolean changeInformation(@Valid @RequestBody ChangeInformationDto changeInformationDto,
+                                     @Context ContainerRequestContext containerRequestContext) {
+        var email = getEmailFromContext(containerRequestContext);
+        return authenticationService.changeInformation(changeInformationDto, email);
+    }
 
     private String getEmailFromContext(ContainerRequestContext requestContext) {
         return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.EMAIL.getLabel()))
