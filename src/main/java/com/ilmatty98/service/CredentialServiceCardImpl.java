@@ -14,17 +14,22 @@ public class CredentialServiceCardImpl implements CredentialService<CardDto> {
     private final CardRepository cardRepository;
 
     @Override
-    public List<CardDto> getAll(String idAccount) {
+    public List<CardDto> getAll(Long idAccount) {
         return null;
     }
 
     @Override
-    public CardDto save(String idAccount, CardDto baseDto) {
+    public CardDto insert(Long idAccount, CardDto baseDto) {
         return null;
     }
 
     @Override
-    public boolean delete(String idAccount, CardDto baseDto) {
+    public CardDto edit(Long idAccount, CardDto baseDto) {
+        return null;
+    }
+
+    @Override
+    public boolean delete(Long idAccount, Long idCredential) {
         return false;
     }
 }

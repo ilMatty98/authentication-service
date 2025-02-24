@@ -4,7 +4,10 @@ import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.dto.credential.BaseDto;
 import com.ilmatty98.interceptor.BearerAuthenticated;
 import com.ilmatty98.service.CredentialService;
+import com.ilmatty98.validator.ValidationCredential;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.groups.ConvertGroup;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
@@ -22,33 +25,38 @@ public abstract class CredentialResource<Dto extends BaseDto, Service extends Cr
     @GET
     @BearerAuthenticated
     public List<Dto> getAll(@Context ContainerRequestContext containerRequestContext) {
-        var id = getAccountIdFromContext(containerRequestContext);
-        return credentialService.getAll(id);
+        var idAccount = getAccountIdFromContext(containerRequestContext);
+        return credentialService.getAll(idAccount);
     }
 
     @POST
     @BearerAuthenticated
-    public Dto save(@Valid @RequestBody Dto cardDto,
+    public Dto insert(@Valid @ConvertGroup(to = ValidationCredential.Post.class) @RequestBody Dto baseDto,
+                      @Context ContainerRequestContext containerRequestContext) {
+        var idAccount = getAccountIdFromContext(containerRequestContext);
+        return credentialService.insert(idAccount, baseDto);
+    }
+
+    @PUT
+    @BearerAuthenticated
+    public Dto edit(@Valid @ConvertGroup(to = ValidationCredential.Put.class) @RequestBody Dto baseDto,
                     @Context ContainerRequestContext containerRequestContext) {
-        //TODO: applicare il validator su questa regola
-        if (cardDto.getId() == null) throw new BadRequestException();
-        var id = getAccountIdFromContext(containerRequestContext);
-        return credentialService.save(id, cardDto);
+        var idAccount = getAccountIdFromContext(containerRequestContext);
+        return credentialService.edit(idAccount, baseDto);
     }
 
     @DELETE
+    @Path("/{idCredential}")
     @BearerAuthenticated
-    public boolean delete(@Valid @RequestBody Dto cardDto,
+    public boolean delete(@PathParam("idCredential") @NotNull Long idCredential,
                           @Context ContainerRequestContext containerRequestContext) {
-        //TODO: applicare il validator su questa regola
-        if (cardDto.getId() == null) throw new BadRequestException();
-        var id = getAccountIdFromContext(containerRequestContext);
-        return credentialService.delete(id, cardDto);
+        var idAccount = getAccountIdFromContext(containerRequestContext);
+        return credentialService.delete(idAccount, idCredential);
     }
 
-    private String getAccountIdFromContext(ContainerRequestContext requestContext) {
+    private Long getAccountIdFromContext(ContainerRequestContext requestContext) {
         return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.ID.getLabel()))
-                .map(Object::toString)
+                .map(obj -> Long.valueOf(obj.toString()))
                 .orElseThrow(() -> new NotAuthorizedException("Missing id in request context"));
     }
 

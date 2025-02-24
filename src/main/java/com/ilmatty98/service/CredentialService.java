@@ -7,9 +7,12 @@ import java.util.List;
 
 public interface CredentialService<Dto extends BaseDto> {
 
-    List<Dto> getAll(String idAccount);
+    List<Dto> getAll(Long idAccount);
 
-    Dto save(String idAccount, Dto baseDto);
+    Dto insert(Long idAccount, Dto baseDto);
 
-    boolean delete(String idAccount, Dto baseDto);
+    Dto edit(Long idAccount, Dto baseDto);
+
+    boolean delete(Long idAccount, Long idCredential);
+
 }

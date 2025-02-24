@@ -14,17 +14,22 @@ public class CredentialServiceLoginImpl implements CredentialService<LoginDto> {
     private final LoginRepository loginRepository;
 
     @Override
-    public List<LoginDto> getAll(String idAccount) {
+    public List<LoginDto> getAll(Long idAccount) {
         return null;
     }
 
     @Override
-    public LoginDto save(String idAccount, LoginDto baseDto) {
+    public LoginDto insert(Long idAccount, LoginDto baseDto) {
         return null;
     }
 
     @Override
-    public boolean delete(String idAccount, LoginDto baseDto) {
+    public LoginDto edit(Long idAccount, LoginDto baseDto) {
+        return null;
+    }
+
+    @Override
+    public boolean delete(Long idAccount, Long idCredential) {
         return false;
     }
 }
