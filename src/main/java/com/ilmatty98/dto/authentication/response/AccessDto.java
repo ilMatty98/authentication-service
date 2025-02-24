@@ -1,4 +1,4 @@
-package com.ilmatty98.dto.response;
+package com.ilmatty98.dto.authentication.response;
 
 import lombok.Data;
 
@@ -10,10 +10,6 @@ public class AccessDto {
     private String token;
 
     private String tokenPublicKey;
-
-    private String protectedSymmetricKey;
-
-    private String initializationVector;
 
     private String language;
 

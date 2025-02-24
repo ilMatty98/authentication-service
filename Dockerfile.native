@@ -3,14 +3,14 @@
 # https://quay.io/repository/quarkus/ubi-quarkus-native-image
 FROM quay.io/quarkus/ubi-quarkus-native-image:22.3-java17 AS build
 
-# Copy the Maven Wrapper script (`mvnw`) to the working directory and set permissions for the quarkus user
+# Copy the Maven Wrapper script (`mvnw`) to the working directory and set permissions for the quarkus account
 COPY --chown=quarkus:quarkus mvnw /code/mvnw
 # Copy the .mvn folder required for Maven wrapper
 COPY --chown=quarkus:quarkus .mvn /code/.mvn
 # Copy the pom.xml file to specify dependencies
 COPY --chown=quarkus:quarkus pom.xml /code/
 
-# Set the user to quarkus for security purposes
+# Set the account to quarkus for security purposes
 USER quarkus
 # Set the working directory to /code
 WORKDIR /code
@@ -40,7 +40,7 @@ WORKDIR /work/
 # Copy the native application binary from the build stage
 COPY --from=build /code/target/*-runner /work/application
 
-# Set permissions for user '1001' and working directory
+# Set permissions for account '1001' and working directory
 RUN chmod 775 /work /work/application \
   && chown -R 1001 /work \
   && chmod -R "g+rwX" /work \
@@ -49,7 +49,7 @@ RUN chmod 775 /work /work/application \
 # Expose port 8080 for accessing the application
 EXPOSE 8080
 
-# Run the application as user 1001 instead of root for security purposes
+# Run the application as account 1001 instead of root for security purposes
 USER 1001
 
 # Start the native application and configure it to listen on all network interfaces
