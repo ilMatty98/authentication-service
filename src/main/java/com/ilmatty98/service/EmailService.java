@@ -2,7 +2,7 @@ package com.ilmatty98.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ilmatty98.constants.EmailTypeEnum;
-import com.ilmatty98.dto.EmailTemplateDto;
+import com.ilmatty98.dto.authentication.EmailTemplateDto;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;

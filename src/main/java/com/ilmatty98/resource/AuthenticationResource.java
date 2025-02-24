@@ -1,8 +1,8 @@
 package com.ilmatty98.resource;
 
 import com.ilmatty98.constants.TokenClaimEnum;
-import com.ilmatty98.dto.request.*;
-import com.ilmatty98.dto.response.AccessDto;
+import com.ilmatty98.dto.authentication.request.*;
+import com.ilmatty98.dto.authentication.response.AccessDto;
 import com.ilmatty98.interceptor.BearerAuthenticated;
 import com.ilmatty98.service.AuthenticationService;
 import jakarta.validation.Valid;

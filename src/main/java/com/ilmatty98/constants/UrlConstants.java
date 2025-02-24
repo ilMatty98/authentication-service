@@ -9,8 +9,6 @@ public class UrlConstants {
     public static class Authentication {
         public static final String BASE_PATH_AUTHENTICATION = "/v1/authentication";
 
-        public static final String HEADER_EMAIL = "email";
-
         public static final String LOG_IN = "/logIn";
         public static final String SIGN_UP = "/signUp";
         public static final String SEND_HINT = "/sendHint/{email}";
@@ -21,6 +19,14 @@ public class UrlConstants {
         public static final String CHANGE_INFORMATION = "/changeInformation";
         public static final String CONFIRM_EMAIL = "/{email}/{code}/confirm";
         public static final String CONFIRM_CHANGE_EMAIL = "/confirmChangeEmail";
+    }
+
+    public static class Login {
+        public static final String BASE_PATH_LOGIN = "/v1/login";
+    }
+
+    public static class Card {
+        public static final String BASE_PATH_CARD = "/v1/card";
     }
 
 }

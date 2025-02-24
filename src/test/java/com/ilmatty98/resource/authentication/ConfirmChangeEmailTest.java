@@ -2,7 +2,7 @@ package com.ilmatty98.resource.authentication;
 
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
-import com.ilmatty98.dto.request.ConfirmChangeEmailDto;
+import com.ilmatty98.dto.authentication.request.ConfirmChangeEmailDto;
 import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;

@@ -2,7 +2,7 @@ package com.ilmatty98.mapper;
 
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
-import com.ilmatty98.dto.request.SignUpDto;
+import com.ilmatty98.dto.authentication.request.SignUpDto;
 import com.ilmatty98.entity.Account;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;

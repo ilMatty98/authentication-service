@@ -2,7 +2,7 @@ package com.ilmatty98.resource.authentication;
 
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
-import com.ilmatty98.dto.request.DeleteDto;
+import com.ilmatty98.dto.authentication.request.DeleteDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.mail.MessagingException;

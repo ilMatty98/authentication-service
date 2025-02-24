@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 @ToString(exclude = {"account"})
 public class BaseCredential {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

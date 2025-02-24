@@ -1,6 +1,6 @@
-package com.ilmatty98.dto.request;
+package com.ilmatty98.dto.authentication.request;
 
-import com.ilmatty98.dto.BaseDto;
+import com.ilmatty98.dto.authentication.BaseDto;
 import com.ilmatty98.validator.MaxSize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

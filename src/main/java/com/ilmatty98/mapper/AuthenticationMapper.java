@@ -1,8 +1,8 @@
 package com.ilmatty98.mapper;
 
 import com.ilmatty98.constants.AccountStateEnum;
-import com.ilmatty98.dto.request.SignUpDto;
-import com.ilmatty98.dto.response.AccessDto;
+import com.ilmatty98.dto.authentication.request.SignUpDto;
+import com.ilmatty98.dto.authentication.response.AccessDto;
 import com.ilmatty98.entity.Account;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

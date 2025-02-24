@@ -1,4 +1,4 @@
-package com.ilmatty98.dto;
+package com.ilmatty98.dto.authentication;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -3,7 +3,7 @@ package com.ilmatty98.resource.authentication;
 import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.constants.TokenClaimEnum;
-import com.ilmatty98.dto.request.ChangePasswordDto;
+import com.ilmatty98.dto.authentication.request.ChangePasswordDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.mail.MessagingException;
