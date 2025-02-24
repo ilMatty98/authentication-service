@@ -1,0 +1,40 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2" author="ilMatty98">
+        <!-- Create the sequence for the auto increment -->
+        <sql>
+            CREATE SEQUENCE login_seq START WITH 1;
+        </sql>
+
+        <!-- Create table login -->
+        <sql>
+            create table LOGIN
+            (
+                ID                 NUMBER(38) DEFAULT login_seq.nextval NOT NULL,
+                ACCOUNT_ID         NUMBER(38) NOT NULL,
+                NAME               VARCHAR2(100) NOT NULL,
+                NOTES              VARCHAR2(1000),
+                TIMESTAMP_CREATION TIMESTAMP(6) NOT NULL,
+                TIMESTAMP_UPDATED  TIMESTAMP(6) NOT NULL,
+                SITE               VARCHAR2(100),
+                USERNAME           VARCHAR2(100),
+                PASSWORD           VARCHAR2(100)
+            )
+        </sql>
+
+        <!-- Create constraint to add primary key -->
+        <sql>
+            ALTER TABLE LOGIN ADD (CONSTRAINT login_pk PRIMARY KEY (ID));
+        </sql>
+
+        <!-- Add foreign key constraint -->
+        <sql>
+            ALTER TABLE LOGIN
+                ADD CONSTRAINT login_account_fk FOREIGN KEY (ACCOUNT_ID) REFERENCES ACCOUNT (ID);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

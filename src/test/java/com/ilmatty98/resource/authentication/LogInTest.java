@@ -2,7 +2,7 @@ package com.ilmatty98.resource.authentication;
 
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.dto.request.LogInDto;
+import com.ilmatty98.dto.authentication.request.LogInDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.mail.MessagingException;
@@ -136,7 +136,7 @@ class LogInTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testUserNotFound() {
+    void testAccountNotFound() {
         signUp(EMAIL, PASSWORD);
         var logIn = fillObject(new LogInDto());
         logIn.setEmail("a" + EMAIL);
@@ -152,11 +152,11 @@ class LogInTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testUserUnverified() {
-        var user = signUp(EMAIL, PASSWORD);
+    void testAccountUnverified() {
+        var account = signUp(EMAIL, PASSWORD);
 
         var logIn = fillObject(new LogInDto());
-        logIn.setEmail(user.getEmail());
+        logIn.setEmail(account.getEmail());
         logIn.setIpAddress(IP_ADDRESS);
 
         given()
@@ -189,8 +189,8 @@ class LogInTest extends AuthenticationServiceTests {
 
     @Test
     void testLogIn() throws MessagingException {
-        var user = signUp(EMAIL, PASSWORD);
-        user = confirmEmail(EMAIL);
+        var account = signUp(EMAIL, PASSWORD);
+        account = confirmEmail(EMAIL);
 
         var logIn = fillObject(new LogInDto());
         logIn.setEmail(EMAIL);
@@ -207,11 +207,9 @@ class LogInTest extends AuthenticationServiceTests {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("token", not(emptyOrNullString()))
                 .body("tokenPublicKey", equalTo(tokenJwtService.getPublicKey()))
-                .body("protectedSymmetricKey", equalTo(authenticationMapper.base64DecodingString(user.getProtectedSymmetricKey())))
-                .body("initializationVector", equalTo(authenticationMapper.base64DecodingString(user.getInitializationVector())))
-                .body("language", equalTo(user.getLanguage()))
-                .body("propic", equalTo(user.getPropic()))
-                .body("hint", equalTo(user.getHint()))
+                .body("language", equalTo(account.getLanguage()))
+                .body("propic", equalTo(account.getPropic()))
+                .body("hint", equalTo(account.getHint()))
                 .body("timestampCreation", not(emptyOrNullString()))
                 .body("timestampLastAccess", not(emptyOrNullString()))
                 .body("timestampPassword", not(emptyOrNullString()))

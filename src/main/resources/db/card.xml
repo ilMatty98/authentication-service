@@ -1,0 +1,41 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="3" author="ilMatty98">
+        <!-- Create the sequence for the auto increment -->
+        <sql>
+            CREATE SEQUENCE card_seq START WITH 1;
+        </sql>
+
+        <!-- Create table card -->
+        <sql>
+            create table CARD
+            (
+                ID                 NUMBER(38) DEFAULT card_seq.nextval NOT NULL,
+                ACCOUNT_ID         NUMBER(38) NOT NULL,
+                NAME               VARCHAR2(100) NOT NULL,
+                NOTES              VARCHAR2(1000),
+                TIMESTAMP_CREATION TIMESTAMP(6) NOT NULL,
+                TIMESTAMP_UPDATED  TIMESTAMP(6) NOT NULL,
+                CARD_HOLDER        VARCHAR2(100),
+                "NUMBER"           VARCHAR2(100),
+                EXPIRATION         DATE,
+                CVV                VARCHAR2(3)
+            )
+        </sql>
+
+        <!-- Create constraint to add primary key -->
+        <sql>
+            ALTER TABLE CARD ADD (CONSTRAINT card_pk PRIMARY KEY (ID));
+        </sql>
+
+        <!-- Add foreign key constraint -->
+        <sql>
+            ALTER TABLE CARD
+                ADD CONSTRAINT card_account_fk FOREIGN KEY (ACCOUNT_ID) REFERENCES ACCOUNT (ID);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
