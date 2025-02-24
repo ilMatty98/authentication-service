@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: credentials-service # Name of container
-          image: ilmatty98/credentials-service:2.1.1-SNAPSHOT23
+          image: ilmatty98/credentials-service:2.1.1-SNAPSHOT24
           imagePullPolicy: Always
           ports:
             - containerPort: 8080 # Port on which the container exposes the service
