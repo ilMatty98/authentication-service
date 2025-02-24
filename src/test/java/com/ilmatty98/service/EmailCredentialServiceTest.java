@@ -1,7 +1,7 @@
 package com.ilmatty98.service;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import com.ilmatty98.constants.EmailTypeEnum;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.mail.MessagingException;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
-class EmailServiceTest extends AuthenticationServiceTests {
+class EmailCredentialServiceTest extends AuthenticationCredentialServiceTests {
 
     private static final String EMAIL_TO = "test@test.com";
     private static final String EN = "EN";
@@ -131,7 +131,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
 
     private void verifyEmail(EmailTypeEnum emailType, String expectedSubject, List<String> label,
                              Map<String, String> dynamicLabels) throws MessagingException {
-        emailService.sendEmail(EMAIL_TO, EmailServiceTest.EN, emailType, dynamicLabels, true);
+        emailService.sendEmail(EMAIL_TO, EmailCredentialServiceTest.EN, emailType, dynamicLabels, true);
 
         var receivedMessages = greenMail.getReceivedMessages();
         assertTrue(greenMail.waitForIncomingEmail(5000, 1));

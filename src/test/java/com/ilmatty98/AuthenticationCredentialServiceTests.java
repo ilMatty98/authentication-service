@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AuthenticationServiceTests extends ApiTestConstants {
+public abstract class AuthenticationCredentialServiceTests extends ApiTestConstants {
 
     @Inject
     protected EmailService emailService;

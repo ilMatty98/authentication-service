@@ -2,7 +2,10 @@ package com.ilmatty98.resource;
 
 import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.dto.credential.BaseDto;
+import com.ilmatty98.entity.BaseCredential;
 import com.ilmatty98.interceptor.BearerAuthenticated;
+import com.ilmatty98.mapper.CredentialMapper;
+import com.ilmatty98.repository.BaseCredentialRepository;
 import com.ilmatty98.service.CredentialService;
 import com.ilmatty98.validator.ValidationCredential;
 import jakarta.validation.Valid;
@@ -18,7 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public abstract class CredentialResource<Dto extends BaseDto, Service extends CredentialService<Dto>> {
+public abstract class CredentialResource<Entity extends BaseCredential, Dto extends BaseDto,
+        Mapper extends CredentialMapper<Entity, Dto>, Repository extends BaseCredentialRepository<Entity>,
+        Service extends CredentialService<Entity, Dto, Mapper, Repository>> {
 
     private final Service credentialService;
 

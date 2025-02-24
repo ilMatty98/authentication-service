@@ -1,6 +1,6 @@
 package com.ilmatty98.service;
 
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.quarkus.security.UnauthorizedException;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
-class TokenJwtServiceTest extends AuthenticationServiceTests {
+class TokenJwtCredentialServiceTest extends AuthenticationCredentialServiceTests {
 
     @Test
     void testGenerateTokenJwtAndValidate() {

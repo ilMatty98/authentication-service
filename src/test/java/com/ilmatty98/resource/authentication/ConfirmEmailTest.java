@@ -1,6 +1,6 @@
 package com.ilmatty98.resource.authentication;
 
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.authentication.request.LogInDto;
 import io.quarkus.test.junit.QuarkusTest;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @QuarkusTest
-class ConfirmEmailTest extends AuthenticationServiceTests {
+class ConfirmEmailTest extends AuthenticationCredentialServiceTests {
 
     @Test
     void testEmailNotFound() {

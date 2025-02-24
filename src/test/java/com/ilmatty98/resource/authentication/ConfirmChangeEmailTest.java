@@ -1,6 +1,6 @@
 package com.ilmatty98.resource.authentication;
 
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.authentication.request.ConfirmChangeEmailDto;
 import com.ilmatty98.entity.Account;
@@ -17,7 +17,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
-class ConfirmChangeEmailTest extends AuthenticationServiceTests {
+class ConfirmChangeEmailTest extends AuthenticationCredentialServiceTests {
 
     private static final String NEW_EMAIL = "new" + EMAIL;
 

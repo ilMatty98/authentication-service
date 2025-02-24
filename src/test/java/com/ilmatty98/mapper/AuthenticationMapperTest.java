@@ -1,6 +1,6 @@
 package com.ilmatty98.mapper;
 
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.authentication.request.SignUpDto;
 import com.ilmatty98.entity.Account;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @QuarkusTest
-class AuthenticationMapperTest extends AuthenticationServiceTests {
+class AuthenticationMapperTest extends AuthenticationCredentialServiceTests {
 
     @Test
     void testNewAccount() {

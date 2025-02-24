@@ -1,6 +1,6 @@
 package com.ilmatty98.resource.authentication;
 
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.authentication.request.DeleteDto;
 import io.quarkus.test.junit.QuarkusTest;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
-class DeleteAccountTest extends AuthenticationServiceTests {
+class DeleteAccountTest extends AuthenticationCredentialServiceTests {
 
     @Test
     void testWithoutToken() {
