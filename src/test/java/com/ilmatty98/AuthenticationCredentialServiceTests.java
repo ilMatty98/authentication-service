@@ -2,14 +2,14 @@ package com.ilmatty98;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.ilmatty98.constants.UserStateEnum;
-import com.ilmatty98.dto.request.ChangeEmailDto;
-import com.ilmatty98.dto.request.LogInDto;
-import com.ilmatty98.dto.request.SignUpDto;
-import com.ilmatty98.dto.response.AccessDto;
-import com.ilmatty98.entity.User;
+import com.ilmatty98.constants.AccountStateEnum;
+import com.ilmatty98.dto.authentication.request.ChangeEmailDto;
+import com.ilmatty98.dto.authentication.request.LogInDto;
+import com.ilmatty98.dto.authentication.request.SignUpDto;
+import com.ilmatty98.dto.authentication.response.AccessDto;
+import com.ilmatty98.entity.Account;
 import com.ilmatty98.mapper.AuthenticationMapper;
-import com.ilmatty98.repository.UserRepository;
+import com.ilmatty98.repository.AccountRepository;
 import com.ilmatty98.service.EmailService;
 import com.ilmatty98.service.TokenJwtService;
 import io.quarkus.test.junit.QuarkusTest;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AuthenticationServiceTests extends ApiTestConstants {
+public abstract class AuthenticationCredentialServiceTests extends ApiTestConstants {
 
     @Inject
     protected EmailService emailService;
@@ -45,7 +45,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     protected TokenJwtService tokenJwtService;
 
     @Inject
-    protected UserRepository userRepository;
+    protected AccountRepository accountRepository;
 
     @Inject
     protected AuthenticationMapper authenticationMapper;
@@ -63,7 +63,7 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     @BeforeEach
     @Transactional
     public void cleanRepository() {
-        userRepository.deleteAll();
+        accountRepository.deleteAll();
     }
 
     @BeforeEach
@@ -121,18 +121,16 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 field.set(object, Timestamp.from(Instant.now()));
             } else if (field.getType() == BigInteger.class) {
                 field.set(object, BigInteger.valueOf(random.nextLong(1000)));
-            } else if (field.getType() == UserStateEnum.class) {
-                field.set(object, UserStateEnum.VERIFIED);
+            } else if (field.getType() == AccountStateEnum.class) {
+                field.set(object, AccountStateEnum.VERIFIED);
             }
         }
     }
 
-    protected User signUp(String email, String password) {
+    protected Account signUp(String email, String password) {
         var signUp = new SignUpDto();
         signUp.setEmail(email);
         signUp.setMasterPasswordHash(password);
-        signUp.setInitializationVector("initVector");
-        signUp.setProtectedSymmetricKey("protectedSymmetricKey");
         signUp.setLanguage(EN);
         signUp.setHint("Hint");
         signUp.setPropic("Propic");
@@ -145,22 +143,22 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+        return accountRepository.findByEmail(email).orElseGet(Assertions::fail);
     }
 
-    protected User confirmEmail(String email) {
-        var user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
+    protected Account confirmEmail(String email) {
+        var account = accountRepository.findByEmail(email).orElseThrow(RuntimeException::new);
 
         given()
                 .contentType(ContentType.JSON)
-                .patch(CONFIRM_EMAIL_URL, email, user.getVerificationCode())
+                .patch(CONFIRM_EMAIL_URL, email, account.getVerificationCode())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+        return getAccountById(account.getId());
     }
 
-    protected User changeEmail(String email, String password, String newEmail) {
+    protected Account changeEmail(String email, String password, String newEmail) {
         var changeEmailDto = new ChangeEmailDto();
         changeEmailDto.setEmail(email);
         changeEmailDto.setEmail(newEmail);
@@ -175,35 +173,35 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        return userRepository.findByEmail(email).orElseGet(Assertions::fail);
+        return accountRepository.findByEmail(email).orElseGet(Assertions::fail);
     }
 
-    protected User getUserById(Long id) {
+    protected Account getAccountById(Long id) {
         return given()
                 .contentType(ContentType.JSON)
                 .when()
-                .get("/user/{id}", id)
+                .get("/account/{id}", id)
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract()
-                .as(User.class);
+                .as(Account.class);
     }
 
-    protected void saveUser(User user) {
+    protected void saveAccount(Account account) {
         given()
                 .contentType(ContentType.JSON)
-                .body(user)
+                .body(account)
                 .when()
-                .post("/user")
+                .post("/account")
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    protected void deleteUserById(Long id) {
+    protected void deleteAccountById(Long id) {
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .post("/user/{id}", id)
+                .post("/account/{id}", id)
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }

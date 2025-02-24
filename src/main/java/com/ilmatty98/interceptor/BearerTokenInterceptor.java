@@ -2,6 +2,7 @@ package com.ilmatty98.interceptor;
 
 import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.service.TokenJwtService;
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
@@ -12,6 +13,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 
 
+@Priority(0)
 @Interceptor
 @BearerAuthenticated
 public class BearerTokenInterceptor {

@@ -1,6 +1,6 @@
 package com.ilmatty98.resource.authentication;
 
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.mail.MessagingException;
 import jakarta.ws.rs.core.Response;
@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
-class SendHintTest extends AuthenticationServiceTests {
+class SendHintTest extends AuthenticationCredentialServiceTests {
 
     @Test
     void testWithoutEmail() {

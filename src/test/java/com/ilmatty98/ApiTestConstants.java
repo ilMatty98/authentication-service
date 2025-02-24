@@ -2,7 +2,7 @@ package com.ilmatty98;
 
 import lombok.NoArgsConstructor;
 
-import static com.ilmatty98.constants.UrlConstants.*;
+import static com.ilmatty98.constants.UrlConstants.Authentication.*;
 
 @NoArgsConstructor
 public abstract class ApiTestConstants {

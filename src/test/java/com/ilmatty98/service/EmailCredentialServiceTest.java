@@ -1,7 +1,7 @@
 package com.ilmatty98.service;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
-import com.ilmatty98.AuthenticationServiceTests;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
 import com.ilmatty98.constants.EmailTypeEnum;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.mail.MessagingException;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
-class EmailServiceTest extends AuthenticationServiceTests {
+class EmailCredentialServiceTest extends AuthenticationCredentialServiceTests {
 
     private static final String EMAIL_TO = "test@test.com";
     private static final String EN = "EN";
@@ -79,7 +79,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
     @Test
     void testChangeEmailCode() throws MessagingException {
         var expectedSubject = "Your Email Change!";
-        var label = List.of("Your Email Change!", "To finalize changing your Bitwarden email address enter the following code in web vault", "Credentials Manager");
+        var label = List.of("Your Email Change!", "To finalize changing your email address, enter the following code", "Credentials Manager");
         var dynamicLabels = new HashMap<String, String>();
         dynamicLabels.put("code", "123456");
 
@@ -106,8 +106,16 @@ class EmailServiceTest extends AuthenticationServiceTests {
         verifyEmail(EmailTypeEnum.SEND_HINT, expectedSubject, label, dynamicLabels);
     }
 
+    @Test
+    void testDeleteAccount() throws MessagingException {
+        var expectedSubject = "Successfully deleted your Credential Manager account!";
+        var label = List.of("Your account has been deleted", "Successfully deleted your Credential Manager account!", "Credentials Manager");
+
+        verifyEmail(EmailTypeEnum.DELETE_ACCOUNT, expectedSubject, label, new HashMap<>());
+    }
+
     private void verifyLanguage(String language, String expectedSubject, String expectedContainsBody) throws MessagingException {
-        emailService.sendEmail(EMAIL_TO, language, EmailTypeEnum.LOG_IN, new HashMap<>());
+        emailService.sendEmail(EMAIL_TO, language, EmailTypeEnum.LOG_IN, new HashMap<>(), true);
 
         var receivedMessages = greenMail.getReceivedMessages();
         assertTrue(greenMail.waitForIncomingEmail(5000, 1));
@@ -123,7 +131,7 @@ class EmailServiceTest extends AuthenticationServiceTests {
 
     private void verifyEmail(EmailTypeEnum emailType, String expectedSubject, List<String> label,
                              Map<String, String> dynamicLabels) throws MessagingException {
-        emailService.sendEmail(EMAIL_TO, EmailServiceTest.EN, emailType, dynamicLabels);
+        emailService.sendEmail(EMAIL_TO, EmailCredentialServiceTest.EN, emailType, dynamicLabels, true);
 
         var receivedMessages = greenMail.getReceivedMessages();
         assertTrue(greenMail.waitForIncomingEmail(5000, 1));

@@ -1,8 +1,8 @@
 package com.ilmatty98.resource;
 
 import com.ilmatty98.constants.TokenClaimEnum;
-import com.ilmatty98.dto.request.*;
-import com.ilmatty98.dto.response.AccessDto;
+import com.ilmatty98.dto.authentication.request.*;
+import com.ilmatty98.dto.authentication.response.AccessDto;
 import com.ilmatty98.interceptor.BearerAuthenticated;
 import com.ilmatty98.service.AuthenticationService;
 import jakarta.validation.Valid;
@@ -15,7 +15,7 @@ import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.Optional;
 
-import static com.ilmatty98.constants.UrlConstants.*;
+import static com.ilmatty98.constants.UrlConstants.Authentication.*;
 
 @RequiredArgsConstructor
 @Path(BASE_PATH_AUTHENTICATION)
@@ -89,6 +89,14 @@ public class AuthenticationResource {
         return authenticationService.confirmChangeEmail(confirmChangeEmailDto, email);
     }
 
+    @PUT
+    @BearerAuthenticated
+    @Path(CHANGE_INFORMATION)
+    public boolean changeInformation(@Valid @RequestBody ChangeInformationDto changeInformationDto,
+                                     @Context ContainerRequestContext containerRequestContext) {
+        var email = getEmailFromContext(containerRequestContext);
+        return authenticationService.changeInformation(changeInformationDto, email);
+    }
 
     private String getEmailFromContext(ContainerRequestContext requestContext) {
         return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.EMAIL.getLabel()))

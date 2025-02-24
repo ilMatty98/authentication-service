@@ -1,7 +1,7 @@
 package com.ilmatty98.resource.authentication;
 
-import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.dto.request.SignUpDto;
+import com.ilmatty98.AuthenticationCredentialServiceTests;
+import com.ilmatty98.dto.authentication.request.SignUpDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.ws.rs.core.Response;
@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
-class CheckEmailTest extends AuthenticationServiceTests {
+class CheckEmailTest extends AuthenticationCredentialServiceTests {
     private static final String IT = "IT";
 
     @Test
