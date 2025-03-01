@@ -2,7 +2,7 @@ package com.ilmatty98;
 
 import lombok.NoArgsConstructor;
 
-import static com.ilmatty98.constants.UrlConstants.*;
+import static com.ilmatty98.constants.UrlConstants.Authentication.*;
 
 @NoArgsConstructor
 public abstract class ApiTestConstants {
@@ -17,6 +17,8 @@ public abstract class ApiTestConstants {
     protected static final String SEND_HINT_URL = BASE_PATH_AUTHENTICATION + SEND_HINT;
     protected static final String SIGN_UP_URL = BASE_PATH_AUTHENTICATION + SIGN_UP;
     protected static final String LOG_IN_URL = BASE_PATH_AUTHENTICATION + LOG_IN;
+
+    protected static final String GET_ALL_CREDENTIAL = BASE_PATH_AUTHENTICATION + LOG_IN;
 
     protected static final String AUTH_HEADER_NAME = "Authorization";
     protected static final String AUTH_HEADER_PREFIX = "Bearer ";

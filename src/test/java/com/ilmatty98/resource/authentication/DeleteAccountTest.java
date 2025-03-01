@@ -1,8 +1,8 @@
 package com.ilmatty98.resource.authentication;
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.constants.UserStateEnum;
-import com.ilmatty98.dto.request.DeleteDto;
+import com.ilmatty98.constants.AccountStateEnum;
+import com.ilmatty98.dto.authentication.request.DeleteDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.mail.MessagingException;
@@ -31,14 +31,14 @@ class DeleteAccountTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testUserNotFoundForEmail() {
-        var user = signUp(EMAIL, PASSWORD);
-        user = confirmEmail(EMAIL);
+    void testAccountNotFoundForEmail() {
+        var account = signUp(EMAIL, PASSWORD);
+        account = confirmEmail(EMAIL);
         var token = getTokenFromLogIn(EMAIL, PASSWORD);
 
-        user.setEmail(EMAIL + ".");
-        deleteUserById(user.getId());
-        saveUser(user);
+        account.setEmail(EMAIL + ".");
+        deleteAccountById(account.getId());
+        saveAccount(account);
 
         var dto = new DeleteDto();
         dto.setMasterPasswordHash("AAA");
@@ -54,14 +54,14 @@ class DeleteAccountTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testUserNotFoundForState() {
-        var user = signUp(EMAIL, PASSWORD);
-        user = confirmEmail(EMAIL);
+    void testAccountNotFoundForState() {
+        var account = signUp(EMAIL, PASSWORD);
+        account = confirmEmail(EMAIL);
         var token = getTokenFromLogIn(EMAIL, PASSWORD);
 
-        user.setState(UserStateEnum.UNVERIFIED);
-        deleteUserById(user.getId());
-        saveUser(user);
+        account.setState(AccountStateEnum.UNVERIFIED);
+        deleteAccountById(account.getId());
+        saveAccount(account);
 
         var dto = new DeleteDto();
         dto.setMasterPasswordHash("AAA");
@@ -95,7 +95,7 @@ class DeleteAccountTest extends AuthenticationServiceTests {
     }
 
     @Test
-    void testDeleteUser() throws MessagingException {
+    void testDeleteAccount() throws MessagingException {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
 
@@ -111,7 +111,7 @@ class DeleteAccountTest extends AuthenticationServiceTests {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
-        assertTrue(userRepository.findByEmail(EMAIL).isEmpty());
+        assertTrue(accountRepository.findByEmail(EMAIL).isEmpty());
 
         //Check email
         var receivedMessages = greenMail.getReceivedMessages();

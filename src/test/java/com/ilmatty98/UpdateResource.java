@@ -1,7 +1,7 @@
 package com.ilmatty98;
 
-import com.ilmatty98.entity.User;
-import com.ilmatty98.repository.UserRepository;
+import com.ilmatty98.entity.Account;
+import com.ilmatty98.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -10,31 +10,31 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.jboss.resteasy.reactive.RestPath;
 
-@Path("/user")
+@Path("/account")
 @RequiredArgsConstructor
 public class UpdateResource {
 
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     @GET
     @Path("/{id}")
-    public User getUser(@RestPath Long id) {
-        return userRepository.findById(id);
+    public Account getAccount(@RestPath Long id) {
+        return accountRepository.findById(id);
     }
 
     @POST
     @Transactional
-    public User saveUser(@RequestBody User user) {
-        user.setId(null);
-        userRepository.persist(user);
-        return user;
+    public Account saveAccount(@RequestBody Account account) {
+        account.setId(null);
+        accountRepository.persist(account);
+        return account;
     }
 
     @POST
     @Path("/{id}")
     @Transactional
-    public void deleteUserById(@RestPath Long id) {
-        userRepository.deleteById(id);
+    public void deleteAccountById(@RestPath Long id) {
+        accountRepository.deleteById(id);
     }
 }
