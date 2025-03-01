@@ -1,8 +1,8 @@
 package com.ilmatty98.resource;
 
 import com.ilmatty98.constants.TokenClaimEnum;
-import com.ilmatty98.dto.request.*;
-import com.ilmatty98.dto.response.AccessDto;
+import com.ilmatty98.dto.authentication.request.*;
+import com.ilmatty98.dto.authentication.response.AccessDto;
 import com.ilmatty98.interceptor.BearerAuthenticated;
 import com.ilmatty98.service.AuthenticationService;
 import jakarta.validation.Valid;
@@ -10,13 +10,15 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.Optional;
 
-import static com.ilmatty98.constants.UrlConstants.*;
+import static com.ilmatty98.constants.UrlConstants.Authentication.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Path(BASE_PATH_AUTHENTICATION)
 public class AuthenticationResource {
@@ -89,11 +91,22 @@ public class AuthenticationResource {
         return authenticationService.confirmChangeEmail(confirmChangeEmailDto, email);
     }
 
+    @PUT
+    @BearerAuthenticated
+    @Path(CHANGE_INFORMATION)
+    public boolean changeInformation(@Valid @RequestBody ChangeInformationDto changeInformationDto,
+                                     @Context ContainerRequestContext containerRequestContext) {
+        var email = getEmailFromContext(containerRequestContext);
+        return authenticationService.changeInformation(changeInformationDto, email);
+    }
 
     private String getEmailFromContext(ContainerRequestContext requestContext) {
         return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.EMAIL.getLabel()))
                 .map(Object::toString)
-                .orElseThrow(() -> new NotAuthorizedException("Missing email in request context"));
+                .orElseThrow(() -> {
+                    log.error("Missing email in request context");
+                    return new NotAuthorizedException("");
+                });
     }
 
 }
