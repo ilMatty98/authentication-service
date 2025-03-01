@@ -16,8 +16,6 @@ import java.util.UUID;
 public interface AuthenticationMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "logins", ignore = true)
     @Mapping(target = "attempt", ignore = true)
     @Mapping(target = "newEmail", ignore = true)
     @Mapping(target = "hint", source = "signUpDto.hint")
@@ -32,6 +30,8 @@ public interface AuthenticationMapper {
     @Mapping(target = "verificationCode", expression = "java(getUUID())")
     @Mapping(target = "salt", source = "salt", qualifiedByName = "base64Encoding")
     @Mapping(target = "hash", source = "hash", qualifiedByName = "base64Encoding")
+    @Mapping(target = "cards", ignore = true)
+    @Mapping(target = "credentials", ignore = true)
     Account newAccount(SignUpDto signUpDto, byte[] salt, byte[] hash, Timestamp timestamp, AccountStateEnum accountStateEnum);
 
     @Mapping(target = "token", source = "token")

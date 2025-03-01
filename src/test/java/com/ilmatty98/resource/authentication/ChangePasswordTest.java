@@ -1,6 +1,6 @@
 package com.ilmatty98.resource.authentication;
 
-import com.ilmatty98.AuthenticationCredentialServiceTests;
+import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.dto.authentication.request.ChangePasswordDto;
@@ -16,7 +16,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
-class ChangePasswordTest extends AuthenticationCredentialServiceTests {
+class ChangePasswordTest extends AuthenticationServiceTests {
 
     @Test
     void testWithoutToken() {

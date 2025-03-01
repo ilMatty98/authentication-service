@@ -18,6 +18,8 @@ public abstract class ApiTestConstants {
     protected static final String SIGN_UP_URL = BASE_PATH_AUTHENTICATION + SIGN_UP;
     protected static final String LOG_IN_URL = BASE_PATH_AUTHENTICATION + LOG_IN;
 
+    protected static final String GET_ALL_CREDENTIAL = BASE_PATH_AUTHENTICATION + LOG_IN;
+
     protected static final String AUTH_HEADER_NAME = "Authorization";
     protected static final String AUTH_HEADER_PREFIX = "Bearer ";
 

@@ -68,7 +68,7 @@ public class AuthenticationService {
 
     @Transactional
     public boolean signUp(SignUpDto signUpDto) {
-        log.info("Init signUp for account {}", signUpDto.getEmail());
+        log.info("Init sign up for account {}", signUpDto.getEmail());
         if (accountRepository.existsByEmail(signUpDto.getEmail())) {
             log.warn("Account {} already registered", signUpDto.getEmail());
             throw new BadRequestException();
@@ -84,13 +84,13 @@ public class AuthenticationService {
 
         emailService.sendEmail(account.getEmail(), account.getLanguage(), EmailTypeEnum.SING_UP, dynamicLabels, true);
         accountRepository.persist(account);
-        log.info("End signUp for account {}", signUpDto.getEmail());
+        log.info("End sign up for account {}", signUpDto.getEmail());
         return true;
     }
 
     @Transactional
     public AccessDto logIn(LogInDto logInDto) {
-        log.info("Init logIn for account {}", logInDto.getEmail());
+        log.info("Init log in for account {}", logInDto.getEmail());
         var account = getAccount(() -> accountRepository.findByEmail(logInDto.getEmail()), logInDto.getEmail());
 
         if (AccountStateEnum.UNVERIFIED.equals(account.getState())) {
@@ -117,30 +117,30 @@ public class AuthenticationService {
         );
 
         emailService.sendEmail(account.getEmail(), account.getLanguage(), EmailTypeEnum.LOG_IN, dynamicLabels, false);
-        log.info("End logIn for account {}", logInDto.getEmail());
+        log.info("End log in for account {}", logInDto.getEmail());
         return authenticationMapper.newAccessDto(account, token, tokenJwtService.getPublicKey());
     }
 
     public boolean checkEmail(String email) {
-        log.info("Init checkEmail for account {}", email);
+        log.info("Check email for account {}", email);
         return accountRepository.existsByEmail(email);
     }
 
     @Transactional
     public boolean confirmEmail(String email, String code) {
-        log.info("Init confirmEmail for account {}", email);
+        log.info("Init confirm email for account {}", email);
         var account = getAccount(() -> accountRepository.findByEmailAndVerificationCode(email, code), email);
 
         account.setState(AccountStateEnum.VERIFIED);
         account.setVerificationCode(null);
         accountRepository.persist(account);
-        log.info("End confirmEmail for account {}", email);
+        log.info("End confirm email for account {}", email);
         return true;
     }
 
     @Transactional
     public boolean changePassword(ChangePasswordDto changePasswordDto, String email) {
-        log.info("Init changePassword for account {}", email);
+        log.info("Init change password for account {}", email);
         var account = getAccount(() -> accountRepository.findByEmailAndState(email, AccountStateEnum.VERIFIED), email);
 
         checkPassword(account, changePasswordDto.getCurrentMasterPasswordHash());
@@ -155,36 +155,36 @@ public class AuthenticationService {
 
         emailService.sendEmail(account.getEmail(), account.getLanguage(), EmailTypeEnum.CHANGE_PSW, new HashMap<>(), true);
         accountRepository.persist(account);
-        log.info("End changePassword for account {}", email);
+        log.info("End change password for account {}", email);
         return true;
     }
 
     public boolean sendHint(String email) {
-        log.info("Init sendHint for account {}", email);
+        log.info("Init send hint for account {}", email);
         var account = getAccount(() -> accountRepository.findByEmailAndState(email, AccountStateEnum.VERIFIED), email);
 
         var dynamicLabels = Map.ofEntries(entry("hint_value", account.getHint()));
         emailService.sendEmail(account.getEmail(), account.getLanguage(), EmailTypeEnum.SEND_HINT, dynamicLabels, true);
-        log.info("End sendHint for account {}", email);
+        log.info("End send hint for account {}", email);
         return true;
     }
 
     @Transactional
     public boolean deleteAccount(String email, DeleteDto deleteDto) {
-        log.info("Init deleteAccount for account {}", email);
+        log.info("Init delete account for account {}", email);
         var account = getAccount(() -> accountRepository.findByEmailAndState(email, AccountStateEnum.VERIFIED), email);
 
         checkPassword(account, deleteDto.getMasterPasswordHash());
 
         accountRepository.delete(account);
         emailService.sendEmail(account.getEmail(), account.getLanguage(), EmailTypeEnum.DELETE_ACCOUNT, new HashMap<>(), true);
-        log.info("End deleteAccount for account {}", email);
+        log.info("End delete account for account {}", email);
         return true;
     }
 
     @Transactional
     public boolean changeEmail(ChangeEmailDto changeEmailDto, String oldEmail) {
-        log.info("Init changeEmail for account {} to {}", oldEmail, changeEmailDto.getEmail());
+        log.info("Init change email for account {} to {}", oldEmail, changeEmailDto.getEmail());
         if (oldEmail.equals(changeEmailDto.getEmail()) || accountRepository.existsByEmail(changeEmailDto.getEmail())) {
             log.warn("Email {} already registered", changeEmailDto.getEmail());
             throw new BadRequestException();
@@ -205,13 +205,13 @@ public class AuthenticationService {
         dynamicLabels = Map.ofEntries(entry("code", account.getVerificationCode()));
         emailService.sendEmail(changeEmailDto.getEmail(), account.getLanguage(), EmailTypeEnum.CHANGE_EMAIL_CODE, dynamicLabels, true);
         accountRepository.persist(account);
-        log.info("End changeEmail for account {} to {}", oldEmail, changeEmailDto.getEmail());
+        log.info("End change email for account {} to {}", oldEmail, changeEmailDto.getEmail());
         return true;
     }
 
     @Transactional(dontRollbackOn = BadRequestException.class)
     public boolean confirmChangeEmail(ConfirmChangeEmailDto confirmChangeEmailDto, String oldEmail) {
-        log.info("Init confirmChangeEmail for account {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
+        log.info("Init confirm change email for account {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
         if (accountRepository.existsByEmail(confirmChangeEmailDto.getEmail())) {
             log.warn("Email {} already registered", confirmChangeEmailDto.getEmail());
             throw new BadRequestException();
@@ -257,13 +257,13 @@ public class AuthenticationService {
             throw new BadRequestException();
         }
 
-        log.info("End confirmChangeEmail for account {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
+        log.info("End confirm change email for account {} to {}", oldEmail, confirmChangeEmailDto.getEmail());
         return true;
     }
 
     @Transactional
     public boolean changeInformation(ChangeInformationDto changeInformationDto, String email) {
-        log.info("Init changeInformation for account {}", email);
+        log.info("Init change information for account {}", email);
         var account = getAccount(() -> accountRepository.findByEmailAndState(email, AccountStateEnum.VERIFIED), email);
 
         account.setHint(changeInformationDto.getHint());
@@ -271,7 +271,7 @@ public class AuthenticationService {
         account.setPropic(changeInformationDto.getPropic());
         accountRepository.persist(account);
 
-        log.info("End changeInformation for account {}", email);
+        log.info("End change information for account {}", email);
         return true;
     }
 

@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @Data
 @MappedSuperclass
 @ToString(exclude = {"account"})
-public class BaseCredential {
+public class Vault {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

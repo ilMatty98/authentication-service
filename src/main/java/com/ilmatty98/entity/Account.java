@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @Entity
-@ToString(exclude = {"logins", "cards"})
+@ToString(exclude = {"credentials", "cards"})
 public class Account {
 
     @Id
@@ -62,7 +62,7 @@ public class Account {
     private String newEmail;
 
     @OneToMany(mappedBy = "account")
-    private List<Login> logins;
+    private List<Credential> credentials;
 
     @OneToMany(mappedBy = "account")
     private List<Card> cards;

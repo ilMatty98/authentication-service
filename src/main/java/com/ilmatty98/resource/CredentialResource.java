@@ -1,68 +1,23 @@
 package com.ilmatty98.resource;
 
-import com.ilmatty98.constants.TokenClaimEnum;
-import com.ilmatty98.dto.credential.BaseDto;
-import com.ilmatty98.entity.BaseCredential;
-import com.ilmatty98.interceptor.BearerAuthenticated;
-import com.ilmatty98.mapper.CredentialMapper;
-import com.ilmatty98.repository.BaseCredentialRepository;
+import com.ilmatty98.dto.vault.CredentialDto;
+import com.ilmatty98.entity.Credential;
+import com.ilmatty98.mapper.CredentialLoginMapper;
+import com.ilmatty98.repository.CredentialRepository;
 import com.ilmatty98.service.CredentialService;
-import com.ilmatty98.validator.ValidationCredential;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.groups.ConvertGroup;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.Context;
-import lombok.RequiredArgsConstructor;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import jakarta.ws.rs.Path;
 
-import java.util.List;
-import java.util.Optional;
+import static com.ilmatty98.constants.UrlConstants.Login.BASE_PATH_LOGIN;
 
-@RequiredArgsConstructor
-public abstract class CredentialResource<Entity extends BaseCredential, Dto extends BaseDto,
-        Mapper extends CredentialMapper<Entity, Dto>, Repository extends BaseCredentialRepository<Entity>,
-        Service extends CredentialService<Entity, Dto, Mapper, Repository>> {
+@Path(BASE_PATH_LOGIN)
+public class CredentialResource extends VaultResource<Credential, CredentialDto, CredentialLoginMapper, CredentialRepository,
+        CredentialService> {
 
-    private final Service credentialService;
-
-    @GET
-    @BearerAuthenticated
-    public List<Dto> getAll(@Context ContainerRequestContext containerRequestContext) {
-        var idAccount = getAccountIdFromContext(containerRequestContext);
-        return credentialService.getAll(idAccount);
+    public CredentialResource(CredentialService credentialService) {
+        super(credentialService);
     }
 
-    @POST
-    @BearerAuthenticated
-    public Dto insert(@Valid @ConvertGroup(to = ValidationCredential.Post.class) @RequestBody Dto baseDto,
-                      @Context ContainerRequestContext containerRequestContext) {
-        var idAccount = getAccountIdFromContext(containerRequestContext);
-        return credentialService.insert(idAccount, baseDto);
+    public CredentialResource() {
+        super(null);
     }
-
-    @PUT
-    @BearerAuthenticated
-    public Dto edit(@Valid @ConvertGroup(to = ValidationCredential.Put.class) @RequestBody Dto baseDto,
-                    @Context ContainerRequestContext containerRequestContext) {
-        var idAccount = getAccountIdFromContext(containerRequestContext);
-        return credentialService.edit(idAccount, baseDto);
-    }
-
-    @DELETE
-    @Path("/{idCredential}")
-    @BearerAuthenticated
-    public boolean delete(@PathParam("idCredential") @NotNull Long idCredential,
-                          @Context ContainerRequestContext containerRequestContext) {
-        var idAccount = getAccountIdFromContext(containerRequestContext);
-        return credentialService.delete(idAccount, idCredential);
-    }
-
-    private Long getAccountIdFromContext(ContainerRequestContext requestContext) {
-        return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.ID.getLabel()))
-                .map(obj -> Long.valueOf(obj.toString()))
-                .orElseThrow(() -> new NotAuthorizedException("Missing id in request context"));
-    }
-
 }

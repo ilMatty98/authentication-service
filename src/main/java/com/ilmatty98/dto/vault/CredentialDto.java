@@ -1,11 +1,11 @@
-package com.ilmatty98.dto.credential;
+package com.ilmatty98.dto.vault;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class LoginDto extends BaseDto {
+public class CredentialDto extends VaultDto {
 
     private String site;
 

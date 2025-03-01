@@ -1,6 +1,6 @@
 package com.ilmatty98.mapper;
 
-import com.ilmatty98.dto.credential.CardDto;
+import com.ilmatty98.dto.vault.CardDto;
 import com.ilmatty98.entity.Card;
 import org.mapstruct.Mapper;
 

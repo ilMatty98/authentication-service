@@ -1,7 +1,7 @@
 package com.ilmatty98.resource.authentication;
 
 
-import com.ilmatty98.AuthenticationCredentialServiceTests;
+import com.ilmatty98.AuthenticationServiceTests;
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.authentication.request.SignUpDto;
 import io.quarkus.test.junit.QuarkusTest;
@@ -15,7 +15,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
-class SignUpTest extends AuthenticationCredentialServiceTests {
+class SignUpTest extends AuthenticationServiceTests {
 
     @Test
     void testSignUpDtoEmpty() {

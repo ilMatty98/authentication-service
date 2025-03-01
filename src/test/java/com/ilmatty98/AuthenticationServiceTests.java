@@ -7,6 +7,8 @@ import com.ilmatty98.dto.authentication.request.ChangeEmailDto;
 import com.ilmatty98.dto.authentication.request.LogInDto;
 import com.ilmatty98.dto.authentication.request.SignUpDto;
 import com.ilmatty98.dto.authentication.response.AccessDto;
+import com.ilmatty98.dto.vault.CardDto;
+import com.ilmatty98.dto.vault.CredentialDto;
 import com.ilmatty98.entity.Account;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.AccountRepository;
@@ -31,12 +33,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
 
+import static com.ilmatty98.constants.UrlConstants.Login.BASE_PATH_LOGIN;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AuthenticationCredentialServiceTests extends ApiTestConstants {
+public abstract class AuthenticationServiceTests extends ApiTestConstants {
 
     @Inject
     protected EmailService emailService;
@@ -204,6 +207,26 @@ public abstract class AuthenticationCredentialServiceTests extends ApiTestConsta
                 .post("/account/{id}", id)
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+    }
+
+    protected void insertLogin(CredentialDto credentialDto) {
+        given()
+                .contentType(ContentType.JSON)
+                .body(credentialDto)
+                .when()
+                .post(BASE_PATH_LOGIN)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+    }
+
+    protected void insertCard(CardDto cardDto) {
+        given()
+                .contentType(ContentType.JSON)
+                .body(cardDto)
+                .when()
+                .post(BASE_PATH_LOGIN)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
     }
 
     protected static String createLargeString(double mb) {

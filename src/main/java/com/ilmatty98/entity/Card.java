@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class Card extends BaseCredential {
+public class Card extends Vault {
 
     @Column(name = "card_holder", length = 100)
     private String cardHolder;

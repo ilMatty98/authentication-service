@@ -1,4 +1,4 @@
-package com.ilmatty98.dto.credential;
+package com.ilmatty98.dto.vault;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CardDto extends BaseDto {
+public class CardDto extends VaultDto {
 
     private String cardHolder;
 

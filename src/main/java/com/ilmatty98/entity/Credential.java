@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class Login extends BaseCredential {
+public class Credential extends Vault {
 
     @Column(name = "site", length = 100)
     private String site;

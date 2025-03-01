@@ -1,4 +1,4 @@
-package com.ilmatty98.dto.credential;
+package com.ilmatty98.dto.vault;
 
 import com.ilmatty98.validator.ValidationCredential;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.Data;
 import java.sql.Timestamp;
 
 @Data
-public abstract class BaseDto {
+public abstract class VaultDto {
 
     @Null(groups = ValidationCredential.Post.class)
     @NotNull(groups = ValidationCredential.Put.class)
