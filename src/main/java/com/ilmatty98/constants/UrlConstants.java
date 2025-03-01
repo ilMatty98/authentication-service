@@ -21,8 +21,8 @@ public class UrlConstants {
         public static final String CONFIRM_CHANGE_EMAIL = "/confirmChangeEmail";
     }
 
-    public static class Login {
-        public static final String BASE_PATH_LOGIN = "/v1/login";
+    public static class Credential {
+        public static final String BASE_PATH_CREDENTIAL = "/v1/credential";
     }
 
     public static class Card {

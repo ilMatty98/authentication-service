@@ -17,7 +17,4 @@ public class CardResource extends VaultResource<Card, CardDto, CredentialCardMap
         super(credentialService);
     }
 
-    public CardResource() {
-        super(null);
-    }
 }

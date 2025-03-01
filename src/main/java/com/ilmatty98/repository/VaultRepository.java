@@ -9,10 +9,10 @@ import java.util.Optional;
 public class VaultRepository<Entity extends Vault> implements PanacheRepository<Entity> {
 
     public List<Entity> findAllByAccountId(Long accountId) {
-        return find("account = ?1", accountId).list();
+        return find("account.id = ?1", accountId).list();
     }
 
     public Optional<Entity> findByIdAndAccountId(Long id, Long accountId) {
-        return find("id = ?1 and account = ?2", id, accountId).firstResultOptional();
+        return find("id = ?1 and account.id = ?2", id, accountId).firstResultOptional();
     }
 }

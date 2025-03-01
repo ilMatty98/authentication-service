@@ -7,9 +7,8 @@ import com.ilmatty98.dto.authentication.request.ChangeEmailDto;
 import com.ilmatty98.dto.authentication.request.LogInDto;
 import com.ilmatty98.dto.authentication.request.SignUpDto;
 import com.ilmatty98.dto.authentication.response.AccessDto;
-import com.ilmatty98.dto.vault.CardDto;
-import com.ilmatty98.dto.vault.CredentialDto;
 import com.ilmatty98.entity.Account;
+import com.ilmatty98.entity.Vault;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.AccountRepository;
 import com.ilmatty98.service.EmailService;
@@ -33,7 +32,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
 
-import static com.ilmatty98.constants.UrlConstants.Login.BASE_PATH_LOGIN;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -200,6 +198,16 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
+    protected void editAccount(Account account) {
+        given()
+                .contentType(ContentType.JSON)
+                .body(account)
+                .when()
+                .put("/account")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+    }
+
     protected void deleteAccountById(Long id) {
         given()
                 .contentType(ContentType.JSON)
@@ -209,24 +217,37 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 
-    protected void insertLogin(CredentialDto credentialDto) {
+    protected <T extends Vault> T getVaultId(Long id, Class<T> clazz) {
+        var endpoint = "/" + clazz.getSimpleName().toLowerCase() + "/{id}";
+        return given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get(endpoint, id)
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .extract()
+                .as(clazz);
+    }
+
+    protected <T extends Vault> void saveVault(Vault vault, Class<T> clazz) {
+        var endpoint = "/" + clazz.getSimpleName().toLowerCase();
         given()
                 .contentType(ContentType.JSON)
-                .body(credentialDto)
+                .body(vault)
                 .when()
-                .post(BASE_PATH_LOGIN)
+                .post(endpoint)
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    protected void insertCard(CardDto cardDto) {
+    protected <T> void deleteVaultById(Long id, Class<T> clazz) {
+        var endpoint = "/" + clazz.getSimpleName().toLowerCase() + "/{id}";
         given()
                 .contentType(ContentType.JSON)
-                .body(cardDto)
                 .when()
-                .post(BASE_PATH_LOGIN)
+                .post(endpoint, id)
                 .then()
-                .statusCode(Response.Status.OK.getStatusCode());
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 
     protected static String createLargeString(double mb) {

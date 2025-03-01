@@ -15,11 +15,13 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
         Mapper extends CredentialMapper<Entity, Dto>, Repository extends VaultRepository<Entity>,
@@ -51,8 +53,8 @@ public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
     }
 
     @DELETE
-    @Path("/{idCredential}")
     @BearerAuthenticated
+    @Path("/{idCredential}")
     public boolean delete(@PathParam("idCredential") @NotNull Long idCredential,
                           @Context ContainerRequestContext containerRequestContext) {
         var idAccount = getAccountIdFromContext(containerRequestContext);
@@ -62,7 +64,10 @@ public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
     private Long getAccountIdFromContext(ContainerRequestContext requestContext) {
         return Optional.ofNullable(requestContext.getProperty(TokenClaimEnum.ID.getLabel()))
                 .map(obj -> Long.valueOf(obj.toString()))
-                .orElseThrow(() -> new NotAuthorizedException("Missing id in request context"));
+                .orElseThrow(() -> {
+                    log.error("Missing id in request context");
+                    return new NotAuthorizedException("");
+                });
     }
 
 }

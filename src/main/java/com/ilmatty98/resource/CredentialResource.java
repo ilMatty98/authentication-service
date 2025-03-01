@@ -7,9 +7,9 @@ import com.ilmatty98.repository.CredentialRepository;
 import com.ilmatty98.service.CredentialService;
 import jakarta.ws.rs.Path;
 
-import static com.ilmatty98.constants.UrlConstants.Login.BASE_PATH_LOGIN;
+import static com.ilmatty98.constants.UrlConstants.Credential.BASE_PATH_CREDENTIAL;
 
-@Path(BASE_PATH_LOGIN)
+@Path(BASE_PATH_CREDENTIAL)
 public class CredentialResource extends VaultResource<Credential, CredentialDto, CredentialLoginMapper, CredentialRepository,
         CredentialService> {
 
@@ -17,7 +17,4 @@ public class CredentialResource extends VaultResource<Credential, CredentialDto,
         super(credentialService);
     }
 
-    public CredentialResource() {
-        super(null);
-    }
 }

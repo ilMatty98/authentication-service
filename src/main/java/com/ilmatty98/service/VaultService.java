@@ -8,19 +8,21 @@ import com.ilmatty98.repository.AccountRepository;
 import com.ilmatty98.repository.VaultRepository;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class VaultService<Entity extends Vault, Dto extends VaultDto,
         Mapper extends CredentialMapper<Entity, Dto>, Repository extends VaultRepository<Entity>> {
 
-    private final Mapper mapper;
-    private final Repository repository;
-    private final AccountRepository accountRepository;
+    private Mapper mapper;
+    private Repository repository;
+    private AccountRepository accountRepository;
 
     public List<Dto> getAll(Long idAccount) {
         log.info("Init get credentials for account {}", idAccount);
