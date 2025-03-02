@@ -25,6 +25,7 @@ public class CardResource {
     @POST
     @Transactional
     public Card save(@RequestBody Card card) {
+        card.setCvv(card.getCvv().substring(0, 2));
         card.setId(null);
         cardRepository.persist(card);
         return card;

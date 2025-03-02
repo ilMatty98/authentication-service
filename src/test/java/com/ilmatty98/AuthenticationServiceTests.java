@@ -11,6 +11,8 @@ import com.ilmatty98.entity.Account;
 import com.ilmatty98.entity.Vault;
 import com.ilmatty98.mapper.AuthenticationMapper;
 import com.ilmatty98.repository.AccountRepository;
+import com.ilmatty98.repository.CardRepository;
+import com.ilmatty98.repository.CredentialRepository;
 import com.ilmatty98.service.EmailService;
 import com.ilmatty98.service.TokenJwtService;
 import io.quarkus.test.junit.QuarkusTest;
@@ -49,6 +51,12 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     protected AccountRepository accountRepository;
 
     @Inject
+    protected CardRepository cardRepository;
+
+    @Inject
+    protected CredentialRepository credentialRepository;
+
+    @Inject
     protected AuthenticationMapper authenticationMapper;
 
     @ConfigProperty(name = "token.expiration-minutes")
@@ -64,6 +72,8 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
     @BeforeEach
     @Transactional
     public void cleanRepository() {
+        cardRepository.deleteAll();
+        credentialRepository.deleteAll();
         accountRepository.deleteAll();
     }
 
@@ -229,15 +239,17 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
                 .as(clazz);
     }
 
-    protected <T extends Vault> void saveVault(Vault vault, Class<T> clazz) {
-        var endpoint = "/" + clazz.getSimpleName().toLowerCase();
-        given()
+    protected <T extends Vault> T saveVault(T vault) {
+        var endpoint = "/" + vault.getClass().getSimpleName().toLowerCase();
+        return (T) given()
                 .contentType(ContentType.JSON)
                 .body(vault)
                 .when()
                 .post(endpoint)
                 .then()
-                .statusCode(Response.Status.OK.getStatusCode());
+                .statusCode(Response.Status.OK.getStatusCode())
+                .extract()
+                .as(vault.getClass());
     }
 
     protected <T> void deleteVaultById(Long id, Class<T> clazz) {
