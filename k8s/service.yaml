@@ -12,4 +12,4 @@ spec:
       targetPort: 8080 # Port on which the container exposes the service
   selector:
     app: credentials-service # Name of deployment
-  type: LoadBalancer # Type of service
+  type: ClusterIP # Type of service
