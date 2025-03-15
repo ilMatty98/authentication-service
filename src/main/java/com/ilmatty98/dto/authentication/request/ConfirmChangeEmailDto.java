@@ -1,4 +1,4 @@
-package com.ilmatty98.dto.request;
+package com.ilmatty98.dto.authentication.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

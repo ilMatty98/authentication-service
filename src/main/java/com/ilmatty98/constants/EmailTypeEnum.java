@@ -13,7 +13,7 @@ public enum EmailTypeEnum {
     SING_UP(EmailConstants.BASE_PATH_LABEL + "signUp.json", EmailConstants.BASE_PATH_TEMPLATE + "signUp.html"),
     SEND_HINT(EmailConstants.BASE_PATH_LABEL + "sendHint.json", EmailConstants.BASE_PATH_TEMPLATE + "sendHint.html"),
     CHANGE_PSW(EmailConstants.BASE_PATH_LABEL + "changePsw.json", EmailConstants.BASE_PATH_TEMPLATE + "changePsw.html"),
-    DELETE_USER(EmailConstants.BASE_PATH_LABEL + "deleteUser.json", EmailConstants.BASE_PATH_TEMPLATE + "deleteUser.html"),
+    DELETE_ACCOUNT(EmailConstants.BASE_PATH_LABEL + "deleteAccount.json", EmailConstants.BASE_PATH_TEMPLATE + "deleteAccount.html"),
     CHANGE_EMAIL(EmailConstants.BASE_PATH_LABEL + "changeEmail.json", EmailConstants.BASE_PATH_TEMPLATE + "changeEmail.html"),
     CHANGE_EMAIL_CODE(EmailConstants.BASE_PATH_LABEL + "changeEmailCode.json", EmailConstants.BASE_PATH_TEMPLATE + "changeEmailCode.html"),
     CHANGE_EMAIL_NOTIFICATION(EmailConstants.BASE_PATH_LABEL + "changeEmailNotification.json", EmailConstants.BASE_PATH_TEMPLATE + "changeEmailNotification.html");
