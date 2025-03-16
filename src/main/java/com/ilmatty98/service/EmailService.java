@@ -2,7 +2,7 @@ package com.ilmatty98.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ilmatty98.constants.EmailTypeEnum;
-import com.ilmatty98.dto.EmailTemplateDto;
+import com.ilmatty98.dto.authentication.EmailTemplateDto;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -30,7 +30,8 @@ public class EmailService {
      **/
     private static final String REGEX = "\\$\\{[^}]+}";
 
-    public void sendEmail(String email, String language, EmailTypeEnum emailTypeEnum, Map<String, String> dynamicLabels) {
+    public void sendEmail(String email, String language, EmailTypeEnum emailTypeEnum, Map<String, String> dynamicLabels,
+                          boolean blocking) {
         try {
             log.warn("Init sending email to {}", email);
 
@@ -47,7 +48,12 @@ public class EmailService {
             mailer.send(Mail.withHtml(email, subject, body));
             log.warn("Email sent successfully to {}", email);
         } catch (Exception e) {
-            log.warn("Error sending email to {}", email, e);
+            if (blocking) {
+                log.error("Error sending email to {}", email, e);
+                throw new RuntimeException();
+            } else {
+                log.warn("Error sending email to {}", email, e);
+            }
         }
     }
 

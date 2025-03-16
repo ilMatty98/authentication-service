@@ -1,7 +1,7 @@
 package com.ilmatty98.interceptor;
 
-import com.ilmatty98.constants.TokenClaimEnum;
 import com.ilmatty98.service.TokenJwtService;
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 
 
+@Priority(0)
 @Interceptor
 @BearerAuthenticated
 public class BearerTokenInterceptor {
@@ -33,10 +34,11 @@ public class BearerTokenInterceptor {
 
         // Verify the token
         var claims = tokenJwtService.validateTokenJwt(token);
-        var email = claims.getOrDefault(TokenClaimEnum.EMAIL.getLabel(), null);
 
-        // Sets the email extracted from the token in the header
-        containerRequestContext.setProperty(TokenClaimEnum.EMAIL.getLabel(), email);
+        // Sets all claims
+        for (var entry : claims.entrySet()) {
+            containerRequestContext.setProperty(entry.getKey(), entry.getValue());
+        }
 
         // If the token is valid, the flow continues execution
         return context.proceed();
