@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
+@BearerAuthenticated
 @RequiredArgsConstructor
 public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
         Mapper extends CredentialMapper<Entity, Dto>, Repository extends VaultRepository<Entity>,
@@ -30,14 +31,12 @@ public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
     private final Service credentialService;
 
     @GET
-    @BearerAuthenticated
     public List<Dto> getAll(@Context ContainerRequestContext containerRequestContext) {
         var idAccount = getAccountIdFromContext(containerRequestContext);
         return credentialService.getAll(idAccount);
     }
 
     @POST
-    @BearerAuthenticated
     public Dto insert(@Valid @ConvertGroup(to = ValidationCredential.Post.class) @RequestBody Dto baseDto,
                       @Context ContainerRequestContext containerRequestContext) {
         var idAccount = getAccountIdFromContext(containerRequestContext);
@@ -45,7 +44,6 @@ public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
     }
 
     @PUT
-    @BearerAuthenticated
     public Dto edit(@Valid @ConvertGroup(to = ValidationCredential.Put.class) @RequestBody Dto baseDto,
                     @Context ContainerRequestContext containerRequestContext) {
         var idAccount = getAccountIdFromContext(containerRequestContext);
@@ -53,7 +51,6 @@ public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
     }
 
     @DELETE
-    @BearerAuthenticated
     @Path("/{idCredential}")
     public boolean delete(@PathParam("idCredential") @NotNull Long idCredential,
                           @Context ContainerRequestContext containerRequestContext) {

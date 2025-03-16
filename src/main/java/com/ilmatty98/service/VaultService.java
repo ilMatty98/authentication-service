@@ -2,10 +2,12 @@ package com.ilmatty98.service;
 
 import com.ilmatty98.constants.AccountStateEnum;
 import com.ilmatty98.dto.vault.VaultDto;
+import com.ilmatty98.entity.Account;
 import com.ilmatty98.entity.Vault;
 import com.ilmatty98.mapper.CredentialMapper;
 import com.ilmatty98.repository.AccountRepository;
 import com.ilmatty98.repository.VaultRepository;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -35,23 +37,30 @@ public abstract class VaultService<Entity extends Vault, Dto extends VaultDto,
                 .toList();
     }
 
+    @Transactional
     public Dto insert(Long idAccount, Dto dto) {
         log.info("Init insert credential for account {}", idAccount);
-        checkAccount(idAccount);
+        var account = checkAccount(idAccount);
+
         var entity = mapper.dtoToEntity(dto);
+        entity.setAccount(account);
         repository.persist(entity);
 
         log.info("End insert credential for account {}", idAccount);
         return mapper.entityToDto(entity);
     }
 
+    @Transactional
     public Dto edit(Long idAccount, Dto dto) {
         log.info("Init edit credential for account {}", idAccount);
-        checkAccount(idAccount);
-        return repository.findByIdAndAccountId(dto.getId(), idAccount)
+        var account = checkAccount(idAccount);
+
+        return repository.findByIdAndAccountId(dto.getId(), account.getId())
                 .map(credential -> {
                     var updatedCredential = mapper.dtoToEntity(dto);
                     updatedCredential.setId(credential.getId());
+                    updatedCredential.setAccount(account);
+
                     repository.persist(updatedCredential);
                     log.info("End edit credential for account {}", idAccount);
                     return mapper.entityToDto(updatedCredential);
@@ -62,10 +71,12 @@ public abstract class VaultService<Entity extends Vault, Dto extends VaultDto,
                 });
     }
 
+    @Transactional
     public boolean delete(Long idAccount, Long idCredential) {
         log.info("Init delete credential for account {}", idAccount);
-        checkAccount(idAccount);
-        repository.findByIdAndAccountId(idCredential, idAccount)
+        var account = checkAccount(idAccount);
+
+        repository.findByIdAndAccountId(idCredential, account.getId())
                 .ifPresentOrElse(repository::delete, () -> {
                     log.warn("For account {}, credential {} not found", idAccount, idCredential);
                     throw new NotFoundException();
@@ -74,16 +85,18 @@ public abstract class VaultService<Entity extends Vault, Dto extends VaultDto,
         return true;
     }
 
-    private void checkAccount(Long idAccount) {
-        accountRepository.findByIdOptional(idAccount)
-                .ifPresentOrElse(account -> {
+    private Account checkAccount(Long idAccount) {
+        return accountRepository.findByIdOptional(idAccount)
+                .map(account -> {
                     if (AccountStateEnum.UNVERIFIED.equals(account.getState())) {
                         log.warn("Account id {} not verified", idAccount);
                         throw new BadRequestException();
                     }
-                }, () -> {
+                    return account;
+                })
+                .orElseThrow(() -> {
                     log.warn("Account id {} not found", idAccount);
-                    throw new NotFoundException();
+                    return new NotFoundException();
                 });
     }
 }
