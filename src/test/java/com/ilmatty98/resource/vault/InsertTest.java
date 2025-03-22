@@ -71,6 +71,44 @@ class InsertTest extends AuthenticationServiceTests {
 
     @ParameterizedTest
     @ValueSource(strings = {BASE_PATH_CREDENTIAL, BASE_PATH_CARD})
+    void testNameNull(String url) {
+        signUp(EMAIL, PASSWORD);
+        confirmEmail(EMAIL);
+        var header = AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD);
+
+        var dto = fillObject(getDtoFilled(url));
+        dto.setName(null);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header(AUTH_HEADER_NAME, header)
+                .body(dto)
+                .post(url)
+                .then()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {BASE_PATH_CREDENTIAL, BASE_PATH_CARD})
+    void testIdLoaded(String url) {
+        signUp(EMAIL, PASSWORD);
+        confirmEmail(EMAIL);
+        var header = AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD);
+
+        var dto = fillObject(getDtoFilled(url));
+        dto.setId(1L);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header(AUTH_HEADER_NAME, header)
+                .body(dto)
+                .post(url)
+                .then()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {BASE_PATH_CREDENTIAL, BASE_PATH_CARD})
     void testInsert(String url) {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
@@ -88,7 +126,6 @@ class InsertTest extends AuthenticationServiceTests {
                     .statusCode(Response.Status.OK.getStatusCode())
                     .extract()
                     .as(CredentialDto.class);
-
 
             assertNotNull(credential.getId());
             assertEquals(dto.getName(), credential.getName());
@@ -111,7 +148,6 @@ class InsertTest extends AuthenticationServiceTests {
                     .statusCode(Response.Status.OK.getStatusCode())
                     .extract()
                     .as(CardDto.class);
-
 
             assertNotNull(card.getId());
             assertEquals(dto.getName(), card.getName());

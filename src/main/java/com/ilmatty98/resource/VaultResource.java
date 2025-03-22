@@ -7,10 +7,8 @@ import com.ilmatty98.interceptor.BearerAuthenticated;
 import com.ilmatty98.mapper.CredentialMapper;
 import com.ilmatty98.repository.VaultRepository;
 import com.ilmatty98.service.VaultService;
-import com.ilmatty98.validator.ValidationCredential;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.groups.ConvertGroup;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
@@ -37,15 +35,15 @@ public abstract class VaultResource<Entity extends Vault, Dto extends VaultDto,
     }
 
     @POST
-    public Dto insert(@Valid @ConvertGroup(to = ValidationCredential.Post.class) @RequestBody Dto baseDto,
-                      @Context ContainerRequestContext containerRequestContext) {
+    public Dto insert(@Valid @RequestBody Dto baseDto, @Context ContainerRequestContext containerRequestContext) {
+        if (baseDto.getId() != null) throw new BadRequestException();
         var idAccount = getAccountIdFromContext(containerRequestContext);
         return credentialService.insert(idAccount, baseDto);
     }
 
     @PUT
-    public Dto edit(@Valid @ConvertGroup(to = ValidationCredential.Put.class) @RequestBody Dto baseDto,
-                    @Context ContainerRequestContext containerRequestContext) {
+    public Dto edit(@Valid @RequestBody Dto baseDto, @Context ContainerRequestContext containerRequestContext) {
+        if (baseDto.getId() == null) throw new BadRequestException();
         var idAccount = getAccountIdFromContext(containerRequestContext);
         return credentialService.edit(idAccount, baseDto);
     }

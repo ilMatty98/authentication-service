@@ -61,7 +61,7 @@ public abstract class VaultService<Entity extends Vault, Dto extends VaultDto,
                     updatedCredential.setId(credential.getId());
                     updatedCredential.setAccount(account);
 
-                    repository.persist(updatedCredential);
+                    repository.getEntityManager().merge(updatedCredential);
                     log.info("End edit credential for account {}", idAccount);
                     return mapper.entityToDto(updatedCredential);
                 })

@@ -42,11 +42,14 @@ class EditTest extends AuthenticationServiceTests {
         var header = AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD);
         deleteAccountById(account.getId());
 
+        var dto = getDtoFilled(url);
+        dto.setId(1L);
+
         given()
                 .contentType(ContentType.JSON)
                 .when()
                 .header(AUTH_HEADER_NAME, header)
-                .body(getDtoFilled(url))
+                .body(dto)
                 .put(url)
                 .then()
                 .statusCode(Response.Status.NOT_FOUND.getStatusCode());
@@ -74,16 +77,56 @@ class EditTest extends AuthenticationServiceTests {
 
     @ParameterizedTest
     @ValueSource(strings = {BASE_PATH_CREDENTIAL, BASE_PATH_CARD})
-    void testEdit(String url) {
+    void testNameNull(String url) {
         signUp(EMAIL, PASSWORD);
         confirmEmail(EMAIL);
         var header = AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD);
 
+        var dto = fillObject(getDtoFilled(url));
+        dto.setName(null);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header(AUTH_HEADER_NAME, header)
+                .body(dto)
+                .put(url)
+                .then()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {BASE_PATH_CREDENTIAL, BASE_PATH_CARD})
+    void testIdNull(String url) {
+        signUp(EMAIL, PASSWORD);
+        confirmEmail(EMAIL);
+        var header = AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD);
+
+        var dto = fillObject(getDtoFilled(url));
+        dto.setId(null);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header(AUTH_HEADER_NAME, header)
+                .body(dto)
+                .put(url)
+                .then()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {BASE_PATH_CREDENTIAL, BASE_PATH_CARD})
+    void testEdit(String url) {
+        var account = signUp(EMAIL, PASSWORD);
+        account = confirmEmail(EMAIL);
+        var header = AUTH_HEADER_PREFIX + getTokenFromLogIn(EMAIL, PASSWORD);
+
         if (BASE_PATH_CREDENTIAL.equals(url)) {
             var entity = fillObject(new Credential());
-            saveVault(entity);
+            entity.setAccount(account);
+            var vault = saveVault(entity);
 
             var dto = fillObject(new CredentialDto());
+            dto.setId(vault.getId());
 
             var credential = given()
                     .contentType(ContentType.JSON)
@@ -106,10 +149,12 @@ class EditTest extends AuthenticationServiceTests {
         } else if (BASE_PATH_CARD.equals(url)) {
             var entity = fillObject(new Card());
             entity.setCvv("321");
-            saveVault(entity);
+            entity.setAccount(account);
+            var vault = saveVault(entity);
 
             var dto = fillObject(new CardDto());
             dto.setCvv("123");
+            dto.setId(vault.getId());
 
             var card = given()
                     .contentType(ContentType.JSON)
@@ -120,7 +165,6 @@ class EditTest extends AuthenticationServiceTests {
                     .statusCode(Response.Status.OK.getStatusCode())
                     .extract()
                     .as(CardDto.class);
-
 
             assertEquals(dto.getId(), card.getId());
             assertEquals(dto.getName(), card.getName());
