@@ -191,6 +191,8 @@ class ChangeInformationTest extends AuthenticationServiceTests {
         assertEquals(EMAIL, u.getEmail());
         assertNotNull(u.getSalt());
         assertNotNull(u.getHash());
+        assertEquals(account.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
+        assertEquals(account.getInitializationVector(), u.getInitializationVector());
         testBetweenTimestamp(account.getTimestampCreation(), u.getTimestampCreation());
         testBetweenTimestamp(account.getTimestampPassword(), u.getTimestampPassword());
         testBetweenTimestamp(account.getTimestampEmail(), u.getTimestampEmail());

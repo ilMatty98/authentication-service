@@ -16,8 +16,6 @@ import java.util.UUID;
 public interface AuthenticationMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "logins", ignore = true)
     @Mapping(target = "attempt", ignore = true)
     @Mapping(target = "newEmail", ignore = true)
     @Mapping(target = "hint", source = "signUpDto.hint")
@@ -32,6 +30,8 @@ public interface AuthenticationMapper {
     @Mapping(target = "verificationCode", expression = "java(getUUID())")
     @Mapping(target = "salt", source = "salt", qualifiedByName = "base64Encoding")
     @Mapping(target = "hash", source = "hash", qualifiedByName = "base64Encoding")
+    @Mapping(target = "initializationVector", source = "signUpDto.initializationVector", qualifiedByName = "base64EncodingString")
+    @Mapping(target = "protectedSymmetricKey", source = "signUpDto.protectedSymmetricKey", qualifiedByName = "base64EncodingString")
     @Mapping(target = "cards", ignore = true)
     @Mapping(target = "credentials", ignore = true)
     Account newAccount(SignUpDto signUpDto, byte[] salt, byte[] hash, Timestamp timestamp, AccountStateEnum accountStateEnum);
@@ -44,6 +44,8 @@ public interface AuthenticationMapper {
     @Mapping(target = "timestampPassword", source = "account.timestampPassword")
     @Mapping(target = "timestampCreation", source = "account.timestampCreation")
     @Mapping(target = "timestampLastAccess", source = "account.timestampLastAccess")
+    @Mapping(target = "initializationVector", source = "account.initializationVector", qualifiedByName = "base64DecodingString")
+    @Mapping(target = "protectedSymmetricKey", source = "account.protectedSymmetricKey", qualifiedByName = "base64DecodingString")
     AccessDto newAccessDto(Account account, String token, String tokenPublicKey);
 
     @Named("base64Encoding")

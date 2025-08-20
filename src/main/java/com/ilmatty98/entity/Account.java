@@ -27,6 +27,12 @@ public class Account {
     @Column(name = "hash", nullable = false, columnDefinition = "CLOB")
     private String hash;
 
+    @Column(name = "protected_symmetric_key", nullable = false, columnDefinition = "CLOB")
+    private String protectedSymmetricKey;
+
+    @Column(name = "initialization_vector", nullable = false, columnDefinition = "CLOB")
+    private String initializationVector;
+
     @Column(name = "timestamp_creation", nullable = false)
     private Timestamp timestampCreation;
 

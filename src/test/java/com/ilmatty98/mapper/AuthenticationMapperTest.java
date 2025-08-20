@@ -39,6 +39,8 @@ class AuthenticationMapperTest extends AuthenticationServiceTests {
         assertEquals(signUpDto.getEmail(), account.getEmail());
         assertEquals(authenticationMapper.base64Encoding(salt), account.getSalt());
         assertEquals(authenticationMapper.base64Encoding(hash), account.getHash());
+        assertEquals(authenticationMapper.base64EncodingString(signUpDto.getProtectedSymmetricKey()), account.getProtectedSymmetricKey());
+        assertEquals(authenticationMapper.base64EncodingString(signUpDto.getInitializationVector()), account.getInitializationVector());
         assertEquals(timestamp, account.getTimestampCreation());
         assertEquals(timestamp, account.getTimestampLastAccess());
         assertEquals(timestamp, account.getTimestampPassword());
@@ -55,10 +57,17 @@ class AuthenticationMapperTest extends AuthenticationServiceTests {
         var token = generateRandomString(2048);
         var tokenPublicKey = generateRandomString(1024);
 
+        var protectedSymmetricKey = account.getProtectedSymmetricKey();
+        var initializationVector = account.getInitializationVector();
+        account.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(protectedSymmetricKey));
+        account.setInitializationVector(authenticationMapper.base64EncodingString(initializationVector));
+
         var loginDto = authenticationMapper.newAccessDto(account, token, tokenPublicKey);
 
         assertEquals(token, loginDto.getToken());
         assertEquals(tokenPublicKey, loginDto.getTokenPublicKey());
+        assertEquals(protectedSymmetricKey, loginDto.getProtectedSymmetricKey());
+        assertEquals(initializationVector, loginDto.getInitializationVector());
         assertEquals(account.getLanguage(), loginDto.getLanguage());
         assertEquals(account.getPropic(), loginDto.getPropic());
         assertEquals(account.getTimestampCreation(), loginDto.getTimestampCreation());

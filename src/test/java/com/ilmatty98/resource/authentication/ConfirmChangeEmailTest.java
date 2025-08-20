@@ -373,6 +373,8 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
         var u = getAccountById(account.getId());
         account.setSalt(u.getSalt());
         account.setHash(u.getHash());
+        account.setProtectedSymmetricKey(authenticationMapper.base64EncodingString("new protectedSymmetricKey"));
+        account.setInitializationVector(authenticationMapper.base64EncodingString("new initializationVector"));
         checkAccount(account, NEW_EMAIL, null, null, null);
 
         assertNotNull(getTokenFromLogIn(NEW_EMAIL, "new masterPasswordHash"));
@@ -395,6 +397,8 @@ class ConfirmChangeEmailTest extends AuthenticationServiceTests {
         assertEquals(email, u.getEmail());
         assertEquals(account.getSalt(), u.getSalt());
         assertEquals(account.getHash(), u.getHash());
+        assertEquals(account.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
+        assertEquals(account.getInitializationVector(), u.getInitializationVector());
         testBetweenTimestamp(account.getTimestampCreation(), u.getTimestampCreation());
         assertTrue(account.getTimestampLastAccess().before(u.getTimestampLastAccess()));
         testBetweenTimestamp(account.getTimestampPassword(), u.getTimestampPassword());

@@ -152,6 +152,8 @@ public class AuthenticationService {
         account.setTimestampPassword(getCurrentTimestamp());
         account.setSalt(authenticationMapper.base64Encoding(salt));
         account.setHash(authenticationMapper.base64Encoding(hash));
+        account.setInitializationVector(authenticationMapper.base64EncodingString(changePasswordDto.getNewInitializationVector()));
+        account.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(changePasswordDto.getNewProtectedSymmetricKey()));
 
         emailService.sendEmail(account.getEmail(), account.getLanguage(), EmailTypeEnum.CHANGE_PSW, new HashMap<>(), true);
         accountRepository.persist(account);
@@ -244,6 +246,8 @@ public class AuthenticationService {
             account.setEmail(account.getNewEmail());
             account.setSalt(authenticationMapper.base64Encoding(salt));
             account.setHash(authenticationMapper.base64Encoding(hash));
+            account.setInitializationVector(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewInitializationVector()));
+            account.setProtectedSymmetricKey(authenticationMapper.base64EncodingString(confirmChangeEmailDto.getNewProtectedSymmetricKey()));
             emailService.sendEmail(account.getEmail(), account.getLanguage(), EmailTypeEnum.CHANGE_EMAIL, new HashMap<>(), true);
         }
 

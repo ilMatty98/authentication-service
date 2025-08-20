@@ -142,6 +142,8 @@ public abstract class AuthenticationServiceTests extends ApiTestConstants {
         var signUp = new SignUpDto();
         signUp.setEmail(email);
         signUp.setMasterPasswordHash(password);
+        signUp.setInitializationVector("initVector");
+        signUp.setProtectedSymmetricKey("protectedSymmetricKey");
         signUp.setLanguage(EN);
         signUp.setHint("Hint");
         signUp.setPropic("Propic");
