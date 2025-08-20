@@ -1,8 +1,8 @@
 package com.ilmatty98.resource.authentication;
 
 import com.ilmatty98.AuthenticationServiceTests;
-import com.ilmatty98.constants.UserStateEnum;
-import com.ilmatty98.dto.request.LogInDto;
+import com.ilmatty98.constants.AccountStateEnum;
+import com.ilmatty98.dto.authentication.request.LogInDto;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.ws.rs.core.Response;
@@ -40,12 +40,12 @@ class ConfirmEmailTest extends AuthenticationServiceTests {
 
     @Test
     void testConfirmEmail() {
-        var user = signUp(ConfirmEmailTest.EMAIL, PASSWORD);
+        var account = signUp(ConfirmEmailTest.EMAIL, PASSWORD);
 
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .patch(CONFIRM_EMAIL_URL, EMAIL, user.getVerificationCode())
+                .patch(CONFIRM_EMAIL_URL, EMAIL, account.getVerificationCode())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
@@ -62,21 +62,21 @@ class ConfirmEmailTest extends AuthenticationServiceTests {
                 .statusCode(Response.Status.OK.getStatusCode());
 
 
-        var u = getUserById(user.getId());
-        assertEquals(user.getId(), u.getId());
-        assertEquals(user.getEmail(), u.getEmail());
-        assertEquals(user.getSalt(), u.getSalt());
-        assertEquals(user.getHash(), u.getHash());
-        assertEquals(user.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
-        assertEquals(user.getInitializationVector(), u.getInitializationVector());
-        testBetweenTimestamp(user.getTimestampCreation(), u.getTimestampCreation());
-        testBetweenTimestamp(user.getTimestampLastAccess(), u.getTimestampLastAccess());
-        testBetweenTimestamp(user.getTimestampPassword(), u.getTimestampPassword());
-        testBetweenTimestamp(user.getTimestampEmail(), u.getTimestampEmail());
-        assertEquals(user.getLanguage(), u.getLanguage());
-        assertEquals(user.getHint(), u.getHint());
-        assertEquals(user.getPropic(), u.getPropic());
-        assertEquals(UserStateEnum.VERIFIED, u.getState());
+        var u = getAccountById(account.getId());
+        assertEquals(account.getId(), u.getId());
+        assertEquals(account.getEmail(), u.getEmail());
+        assertEquals(account.getSalt(), u.getSalt());
+        assertEquals(account.getHash(), u.getHash());
+        assertEquals(account.getProtectedSymmetricKey(), u.getProtectedSymmetricKey());
+        assertEquals(account.getInitializationVector(), u.getInitializationVector());
+        testBetweenTimestamp(account.getTimestampCreation(), u.getTimestampCreation());
+        testBetweenTimestamp(account.getTimestampLastAccess(), u.getTimestampLastAccess());
+        testBetweenTimestamp(account.getTimestampPassword(), u.getTimestampPassword());
+        testBetweenTimestamp(account.getTimestampEmail(), u.getTimestampEmail());
+        assertEquals(account.getLanguage(), u.getLanguage());
+        assertEquals(account.getHint(), u.getHint());
+        assertEquals(account.getPropic(), u.getPropic());
+        assertEquals(AccountStateEnum.VERIFIED, u.getState());
         assertNull(u.getVerificationCode());
         assertNull(u.getNewEmail());
         assertNull(u.getAttempt());
@@ -84,19 +84,19 @@ class ConfirmEmailTest extends AuthenticationServiceTests {
 
     @Test
     void testEmailAlreadyConfirmed() {
-        var user = signUp(ConfirmEmailTest.EMAIL, PASSWORD);
+        var account = signUp(ConfirmEmailTest.EMAIL, PASSWORD);
 
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .patch(CONFIRM_EMAIL_URL, EMAIL, user.getVerificationCode())
+                .patch(CONFIRM_EMAIL_URL, EMAIL, account.getVerificationCode())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
 
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .patch(CONFIRM_EMAIL_URL, EMAIL, user.getVerificationCode())
+                .patch(CONFIRM_EMAIL_URL, EMAIL, account.getVerificationCode())
                 .then()
                 .statusCode(Response.Status.NOT_FOUND.getStatusCode());
     }

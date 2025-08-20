@@ -1,13 +1,26 @@
-package com.ilmatty98.dto.request;
+package com.ilmatty98.dto.authentication.request;
 
+import com.ilmatty98.dto.authentication.BaseDto;
 import com.ilmatty98.validator.MaxSize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class ChangeInformationDto {
+@EqualsAndHashCode(callSuper = true)
+public class SignUpDto extends BaseDto {
+
+    @NotBlank(message = "MasterPasswordHash cannot be blank")
+    private String masterPasswordHash;
+
+    @NotBlank(message = "ProtectedSymmetricKey cannot be blank")
+    private String protectedSymmetricKey;
+
+    @NotBlank(message = "InitializationVector cannot be blank")
+    private String initializationVector;
+
 
     @Pattern(message = "Language is not valid", regexp = "^[A-Z]{2}$")
     @NotBlank(message = "Language cannot be blank")

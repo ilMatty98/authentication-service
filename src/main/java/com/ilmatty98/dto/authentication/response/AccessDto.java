@@ -1,4 +1,4 @@
-package com.ilmatty98.dto.response;
+package com.ilmatty98.dto.authentication.response;
 
 import lombok.Data;
 
